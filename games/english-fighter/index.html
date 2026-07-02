@@ -274,7 +274,7 @@ function colorIcon(c){
 const COL = { red:"#e23b3b", blue:"#3f7fd0", green:"#3fb44a", yellow:"#f5c518", pink:"#ff8fb5" };
 const ENERGY_ORB = `<svg viewBox="0 0 100 100" style="width:13vmin;height:13vmin;overflow:visible"><defs><radialGradient id="eorb" cx="38%" cy="35%" r="70%"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="#9fe4ff"/><stop offset="1" stop-color="#2c8fd6"/></radialGradient></defs><circle cx="50" cy="50" r="46" fill="none" stroke="rgba(159,228,255,.45)" stroke-width="5"/><circle cx="50" cy="50" r="37" fill="url(#eorb)"/><ellipse cx="40" cy="36" rx="11" ry="7" fill="rgba(255,255,255,.7)"/></svg>`;
 
-/* ================= 字庫（英文）：8 個主題，每盤隨機抽 4 關 ================= */
+/* ================= 字庫（英文）：16 個主題，每盤隨機抽 4 關 ================= */
 const BANK = [
   { hp:5, name:"顏色", pool:[["red",colorIcon(COL.red)],["blue",colorIcon(COL.blue)],["green",colorIcon(COL.green)],["yellow",colorIcon(COL.yellow)],["pink",colorIcon(COL.pink)]] },
   { hp:5, name:"動物", pool:[["dog","🐶"],["cat","🐱"],["bird","🐦"],["sheep","🐑"],["fish","🐟"]] },
@@ -284,6 +284,14 @@ const BANK = [
   { hp:5, name:"動物2", pool:[["pig","🐷"],["cow","🐮"],["duck","🦆"],["rabbit","🐰"],["bear","🐻"]] },
   { hp:5, name:"交通", pool:[["car","🚗"],["bus","🚌"],["boat","⛵"],["plane","✈️"],["train","🚂"]] },
   { hp:5, name:"大自然", pool:[["sun","☀️"],["moon","🌙"],["star","⭐"],["tree","🌳"],["flower","🌸"]] },
+  { hp:5, name:"數字", pool:[["one","1️⃣"],["two","2️⃣"],["three","3️⃣"],["four","4️⃣"],["five","5️⃣"]] },
+  { hp:5, name:"動物園", pool:[["lion","🦁"],["tiger","🐯"],["elephant","🐘"],["monkey","🐵"],["horse","🐴"]] },
+  { hp:5, name:"水果", pool:[["orange","🍊"],["strawberry","🍓"],["watermelon","🍉"],["pear","🍐"],["peach","🍑"]] },
+  { hp:5, name:"衣服", pool:[["shirt","👕"],["dress","👗"],["hat","🧢"],["shoes","👟"],["socks","🧦"]] },
+  { hp:5, name:"屋企", pool:[["bed","🛏️"],["chair","🪑"],["door","🚪"],["book","📖"],["cup","🥤"]] },
+  { hp:5, name:"小昆蟲", pool:[["bee","🐝"],["butterfly","🦋"],["frog","🐸"],["snail","🐌"],["ant","🐜"]] },
+  { hp:5, name:"食物2", pool:[["bread","🍞"],["rice","🍚"],["ice cream","🍦"],["water","💧"],["juice","🧃"]] },
+  { hp:5, name:"玩具", pool:[["ball","⚽"],["balloon","🎈"],["kite","🪁"],["drum","🥁"],["robot","🤖"]] },
 ];
 const MAX_PLY_HP = 5;
 const LEVELS_PER_GAME = 4;
@@ -426,8 +434,9 @@ function speakEn(text){ if(!("speechSynthesis" in window)) return; speechSynthes
   const u=new SpeechSynthesisUtterance(text); u.lang="en-GB"; u.rate=.75; u.pitch=1.05; if(enVoice) u.voice=enVoice; speechSynthesis.speak(u); }
 
 /* 講解句式：按語法配啱冠詞 */
-const NO_ARTICLE = new Set(["red","blue","green","yellow","pink","milk","mother","father","brother","sister"]);
-const PLURAL_WORDS = new Set(["eyes","hands"]);
+const NO_ARTICLE = new Set(["red","blue","green","yellow","pink","milk","mother","father","brother","sister",
+  "one","two","three","four","five","bread","rice","ice cream","water","juice"]);
+const PLURAL_WORDS = new Set(["eyes","hands","shoes","socks"]);
 const USE_THE = new Set(["sun","moon"]);
 function itIsPhrase(w){
   if(PLURAL_WORDS.has(w)) return "they are "+w;          // they are eyes
