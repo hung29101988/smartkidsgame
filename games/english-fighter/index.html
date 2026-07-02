@@ -425,6 +425,17 @@ if("speechSynthesis" in window){ pickVoice(); speechSynthesis.onvoiceschanged=pi
 function speakEn(text){ if(!("speechSynthesis" in window)) return; speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(text); u.lang="en-GB"; u.rate=.75; u.pitch=1.05; if(enVoice) u.voice=enVoice; speechSynthesis.speak(u); }
 
+/* 講解句式：按語法配啱冠詞 */
+const NO_ARTICLE = new Set(["red","blue","green","yellow","pink","milk","mother","father","brother","sister"]);
+const PLURAL_WORDS = new Set(["eyes","hands"]);
+const USE_THE = new Set(["sun","moon"]);
+function itIsPhrase(w){
+  if(PLURAL_WORDS.has(w)) return "they are "+w;          // they are eyes
+  if(NO_ARTICLE.has(w))   return "it is "+w;             // it is red / it is mother
+  if(USE_THE.has(w))      return "it is the "+w;         // it is the sun
+  return "it is "+(/^[aeiou]/.test(w)?"an ":"a ")+w;     // it is an apple / a dog
+}
+
 /* ================= 遊戲狀態 ================= */
 const state = { level:0, levels:[], plyHp:MAX_PLY_HP, oppHp:0, oppMaxHp:0, word:null, icon:null, queue:[], learned:new Map(), busy:false };
 
@@ -531,7 +542,7 @@ async function answer(btn){
     bi.innerHTML=wrongIcon;
     bi.style.fontSize=(!wrongIcon.startsWith("<svg") && [...wrongIcon].length>2) ? "11vmin" : "";
     $("bubble").classList.remove("show"); void $("bubble").offsetWidth; $("bubble").classList.add("show");
-    await wait(450); speakEn("it is "+wrongWord); await wait(1300);
+    await wait(450); speakEn(itIsPhrase(wrongWord)); await wait(1300);
     $("bubble").classList.remove("show");
     const ply=$("plySprite"), opp=$("oppSprite");
     opp.classList.remove("lungeL"); void opp.offsetWidth; opp.classList.add("lungeL");
