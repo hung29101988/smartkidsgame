@@ -231,6 +231,35 @@
     box-shadow:0 1.2vmin 0 #1d7c3d; animation:pulse 1.2s ease-in-out infinite; }
   .endBtn:active { transform:translateY(.8vmin); box-shadow:0 .4vmin 0 #1d7c3d; }
 
+  /* ===== 橫向（landscape）排版：兩個方向都完美玩到 ===== */
+  @media (orientation:landscape){
+    /* 開場 */
+    #startHero { width:40vmin; height:38vmin; }
+    .logo { font-size:10.5vmin; }
+    #playBtn { width:17vmin; height:17vmin; font-size:6.5vmin; }
+    /* 遊戲中：城堡窄少少，戰場闊啲 */
+    #castle { width:27vmin; height:54vmin; }
+    #bubble { left:15vmin; }
+    /* 過關畫面：城堡左、文字+按鈕右（兩欄先塞得落）*/
+    #clearScreen.show { display:grid; grid-template-columns:40vw 1fr; column-gap:2vw; row-gap:2.2vmin;
+      grid-template-areas:"castle title" "castle sub" "castle party" "castle btn";
+      align-content:center; align-items:center; justify-items:center; padding:3vmin 5vmin; }
+    #clearCastle { grid-area:castle; width:36vmin; height:60vmin; justify-self:end; }
+    #clearTitle { grid-area:title; font-size:7.5vmin; }
+    #clearSub { grid-area:sub; font-size:4vmin; }
+    #clearParty { grid-area:party; max-width:48vw; }
+    #nextBtn { grid-area:btn; width:15vmin; height:15vmin; font-size:6vmin; }
+    /* 結算畫面：縮細等唔使捲屏 */
+    .endScreen { gap:2vmin; }
+    .endEmoji { font-size:12vmin; }
+    .endTitle { font-size:5.6vmin; }
+    .endSub { font-size:3.6vmin; }
+    .endScore { font-size:5vmin; padding:.6vmin 4vmin; }
+    .partyGuy { height:10vmin; }
+    #learnedWords { max-height:19vmin; max-width:120vmin; }
+    .endBtn { width:14vmin; height:14vmin; font-size:6vmin; }
+  }
+
   /* ===== 抖一抖（護眼）===== */
   #restScreen { position:fixed; inset:0; z-index:200; display:none; flex-direction:column; align-items:center; justify-content:center; gap:3vmin; color:#fff;
     background:radial-gradient(circle at 50% 32%,#41527f 0%,#28305a 52%,#161a35 100%); text-align:center; overflow:hidden; }
@@ -1367,8 +1396,10 @@ function newGame(){
 
 /* ================= 遊玩時間限制（全平台共用）================= */
 const LIMIT_PLAY=10*60*1000, LIMIT_REST=10*60*1000;
-let playMs=0, restUntil=0, lastTick=0, engaged=false;
-try { playMs=Number(localStorage.getItem("wg_playMs"))||0; restUntil=Number(localStorage.getItem("wg_restUntil"))||0; }catch(e){}
+const IDLE_RESET=10*60*1000;   // 停玩超過此時間 → 眼睛已休息，重新計時
+let playMs=0, restUntil=0, lastTick=0, engaged=false, lastActive=0;
+try { playMs=Number(localStorage.getItem("wg_playMs"))||0; restUntil=Number(localStorage.getItem("wg_restUntil"))||0; lastActive=Number(localStorage.getItem("wg_lastActive"))||0; }catch(e){}
+function maybeResetIdle(){ if(inRest()) return; if(playMs>0 && lastActive && (Date.now()-lastActive)>=IDLE_RESET){ playMs=0; try{localStorage.setItem("wg_playMs","0");}catch(e){} } }
 function fmtTime(ms){ const s=Math.max(0,Math.ceil(ms/1000)); return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0"); }
 function inRest(){ return restUntil>Date.now(); }
 function enterRest(){ try{speechSynthesis.cancel();}catch(e){} stopLevel(); $("restScreen").classList.add("show"); $("restTimer").textContent=fmtTime(restUntil-Date.now());
@@ -1380,13 +1411,14 @@ function timeTick(){
   if(inRest()){ if(!$("restScreen").classList.contains("show")) enterRest(); $("restTimer").textContent=fmtTime(restUntil-now); return; }
   if($("restScreen").classList.contains("show")){ endRest(); return; }
   if(engaged && document.visibilityState==="visible"){
-    if(lastTick) playMs+=now-lastTick; lastTick=now;
-    try{localStorage.setItem("wg_playMs",String(playMs));}catch(e){}
+    if(lastTick) playMs+=now-lastTick; lastTick=now; lastActive=now;
+    try{localStorage.setItem("wg_playMs",String(playMs)); localStorage.setItem("wg_lastActive",String(now));}catch(e){}
     if(playMs>=LIMIT_PLAY){ restUntil=now+LIMIT_REST; try{localStorage.setItem("wg_restUntil",String(restUntil));}catch(e){} enterRest(); }
   } else { lastTick=now; }
 }
 setInterval(timeTick,1000);
-document.addEventListener("visibilitychange", ()=>{ lastTick=0; });
+document.addEventListener("visibilitychange", ()=>{ lastTick=0; if(document.visibilityState==="visible") maybeResetIdle(); });
+maybeResetIdle();
 if(inRest()) enterRest();
 
 /* ================= 事件 ================= */

@@ -1044,11 +1044,14 @@ function newGame(){
 /* ================= 遊玩時間限制：玩10分鐘 抖10分鐘 ================= */
 const LIMIT_PLAY = 10*60*1000;   // 連續遊玩上限
 const LIMIT_REST = 10*60*1000;   // 強制休息時間
-let playMs = 0, restUntil = 0, lastTick = 0, engaged = false;
+const IDLE_RESET = 10*60*1000;   // 停玩超過此時間 → 眼睛已休息，重新計時
+let playMs = 0, restUntil = 0, lastTick = 0, engaged = false, lastActive = 0;
 try {
   playMs = Number(localStorage.getItem("wg_playMs")) || 0;
   restUntil = Number(localStorage.getItem("wg_restUntil")) || 0;
+  lastActive = Number(localStorage.getItem("wg_lastActive")) || 0;
 } catch(e){}
+function maybeResetIdle(){ if(inRest()) return; if(playMs>0 && lastActive && (Date.now()-lastActive)>=IDLE_RESET){ playMs=0; try{localStorage.setItem("wg_playMs","0");}catch(e){} } }
 
 function fmtTime(ms){
   const s = Math.max(0, Math.ceil(ms/1000));
@@ -1079,8 +1082,8 @@ function timeTick(){
   if($("restScreen").classList.contains("show")){ endRest(); return; }
   if(engaged && document.visibilityState === "visible"){
     if(lastTick) playMs += now - lastTick;
-    lastTick = now;
-    try { localStorage.setItem("wg_playMs", String(playMs)); } catch(e){}
+    lastTick = now; lastActive = now;
+    try { localStorage.setItem("wg_playMs", String(playMs)); localStorage.setItem("wg_lastActive", String(now)); } catch(e){}
     if(playMs >= LIMIT_PLAY){
       restUntil = now + LIMIT_REST;
       try { localStorage.setItem("wg_restUntil", String(restUntil)); } catch(e){}
@@ -1091,7 +1094,8 @@ function timeTick(){
   }
 }
 setInterval(timeTick, 1000);
-document.addEventListener("visibilitychange", ()=>{ lastTick = 0; });
+document.addEventListener("visibilitychange", ()=>{ lastTick = 0; if(document.visibilityState === "visible") maybeResetIdle(); });
+maybeResetIdle();           // 一載入：若上次玩完已隔耐，重新計時
 if(inRest()) enterRest();   // 一載入若仲喺休息時段，即刻擋住
 
 /* ================= 事件 ================= */
