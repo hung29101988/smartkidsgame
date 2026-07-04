@@ -169,11 +169,21 @@
   .choice:nth-child(1){ background:#ffd6d6; } .choice:nth-child(2){ background:#d6e8ff; }
   .choice:nth-child(3){ background:#d9f5d0; } .choice:nth-child(4){ background:#ffedbf; }
   .choice:active { transform:translateY(.7vmin); box-shadow:0 .4vmin 0 rgba(0,0,0,.18); }
+  .choice { position:relative; }
   .choice.right { background:#43d36b !important; animation:rp .5s ease 2; }
   @keyframes rp { 50%{transform:scale(1.1)} }
   .choice.wrong { background:#9aa0a6 !important; transform:scale(.94); opacity:.85; }
-  .choice.dim { opacity:.35; }
+  .choice.dim { opacity:.25; }
   #choices.locked .choice { pointer-events:none; }
+  /* 引導：正確答案發光跳動 */
+  .choice.hint { background:#43d36b !important; animation:hintPulse .75s ease-in-out infinite; z-index:3; }
+  @keyframes hintPulse {
+    0%,100%{ transform:scale(1); box-shadow:0 1vmin 0 rgba(0,0,0,.18), 0 0 0 0 rgba(67,211,107,.8); }
+    50%{ transform:scale(1.1); box-shadow:0 1vmin 0 rgba(0,0,0,.18), 0 0 0 2.6vmin rgba(67,211,107,0); } }
+  #hintPtr { position:absolute; top:-10vmin; left:50%; z-index:6; font-size:8.5vmin; line-height:1;
+    pointer-events:none; filter:drop-shadow(0 .6vmin .6vmin rgba(0,0,0,.3));
+    animation:ptrBob .55s ease-in-out infinite; }
+  @keyframes ptrBob { 0%,100%{transform:translate(-50%,0)} 50%{transform:translate(-50%,2.2vmin)} }
 
   /* ===== 過關慶祝 ===== */
   #clearScreen { background:radial-gradient(circle at 50% 30%,#4a3f7a 0%,#2a2450 60%,#181430 100%);
@@ -845,10 +855,10 @@ function picHTML(w){ const p=PIC[w]||"❓";
 /* ================= 字庫（每關 10 個：生果 25 + 動物 25 + 蔬菜 10）================= */
 const BANK = [
   ["apple","banana","orange","grape","strawberry","watermelon","pear","peach","lemon","cherry"],
-  ["dog","cat","rabbit","pig","cow","sheep","duck","fish","bird","bee"],
+  ["dog","cat","rabbit","pig","cow","sheep","duck","fish","frog","bee"],
   ["carrot","potato","corn","broccoli","cucumber","mushroom","onion","eggplant","pepper","pumpkin"],
   ["mango","pineapple","coconut","kiwi","melon","plum","tomato","blueberry","avocado","papaya"],
-  ["monkey","elephant","lion","tiger","bear","panda","horse","chicken","mouse","frog"],
+  ["monkey","elephant","lion","tiger","bear","panda","horse","chicken","mouse","bird"],
   ["lychee","durian","dragon fruit","starfruit","grapefruit","penguin","owl","fox","turtle","koala"],
 ].map(lv=>lv.map(w=>[w,ICONS[w]]));
 const NO_ARTICLE = new Set(["corn","broccoli"]);
@@ -859,11 +869,11 @@ function itIsPhrase(w){ if(NO_ARTICLE.has(w)) return "it is "+w;
 
 /* ================= 怪物（5 種，細→大）================= */
 const MTYPE = [
-  { body:"#8fd06e", light:"#c8f0a8", dark:"#467431", size:11, hp:3,  atk:1, spd:5.2, eyes:1, horns:1 },
-  { body:"#6fa8e8", light:"#b8d8f8", dark:"#33567e", size:13, hp:5,  atk:1, spd:3.4, eyes:2, horns:1 },
-  { body:"#e8c24a", light:"#f8e8a8", dark:"#8a6a1a", size:15, hp:7,  atk:2, spd:4.2, eyes:1, horns:2 },
-  { body:"#e88a6f", light:"#f8c8b8", dark:"#8e3a24", size:18, hp:10, atk:2, spd:2.8, eyes:2, horns:2 },
-  { body:"#a97fd8", light:"#d8c0f0", dark:"#5a3a8e", size:22, hp:15, atk:3, spd:2.3, eyes:2, horns:3 },
+  { body:"#8fd06e", light:"#c8f0a8", dark:"#467431", size:11, hp:3,  atk:1, spd:4.0, eyes:1, horns:1 },
+  { body:"#6fa8e8", light:"#b8d8f8", dark:"#33567e", size:13, hp:4,  atk:1, spd:2.8, eyes:2, horns:1 },
+  { body:"#e8c24a", light:"#f8e8a8", dark:"#8a6a1a", size:15, hp:6,  atk:1, spd:3.2, eyes:1, horns:2 },
+  { body:"#e88a6f", light:"#f8c8b8", dark:"#8e3a24", size:18, hp:8,  atk:2, spd:2.2, eyes:2, horns:2 },
+  { body:"#a97fd8", light:"#d8c0f0", dark:"#5a3a8e", size:22, hp:11, atk:2, spd:1.9, eyes:2, horns:3 },
 ];
 function monsterSVG(t){
   const v=MTYPE[t], d=v.dark, u="m"+(_gid++);
@@ -1054,15 +1064,15 @@ function speakEn(text){ if(!("speechSynthesis" in window)) return; speechSynthes
 
 /* ================= 關卡設定 ================= */
 const LEVELS = [
-  { seq:[0,0,1,0,0,1,0,1],                    interval:5200, wall:10 },
-  { seq:[0,1,0,2,1,0,2,1,0,2],                interval:4600, wall:12 },
-  { seq:[1,0,2,1,3,0,2,1,3,2,0,3],            interval:4100, wall:12 },
-  { seq:[2,1,3,2,4,1,3,2,4,3,2,4,1],          interval:3700, wall:14 },
-  { seq:[2,3,2,4,3,2,4,3,4,2,3,4,3,4,4],      interval:3300, wall:14 },
-  { seq:[3,2,4,3,4,2,4,3,4,4,3,2,4,3,4,4],    interval:3000, wall:16 },
+  { seq:[0,0,1,0,0,1,0,1],                    interval:7000, wall:12 },
+  { seq:[0,1,0,1,0,2,0,1,0,2],                interval:6400, wall:14 },
+  { seq:[1,0,2,1,0,2,1,2,0,2,1,2],            interval:6000, wall:14 },
+  { seq:[1,2,1,3,2,1,2,3,2,1,3,2],            interval:5600, wall:16 },
+  { seq:[2,1,3,2,3,1,2,3,2,4,2,3,3],          interval:5200, wall:16 },
+  { seq:[2,3,2,3,4,2,3,3,4,2,3,4,3,4],        interval:4800, wall:18 },
 ];
-const ALLY = { hp:8, atk:2, spd:6.4, cd:600 };
-const MON_CD = 900, WALL_CD = 1200;
+const ALLY = { hp:9, atk:3, spd:6.4, cd:550 };
+const MON_CD = 1000, WALL_CD = 1500;
 
 /* ================= 遊戲狀態 ================= */
 const S = {
@@ -1118,7 +1128,7 @@ function killUnit(u){
 
 function spawnMonster(t){
   const v=MTYPE[t], lv=S.level;
-  const hp = Math.round(v.hp*(1+lv*.12));
+  const hp = Math.round(v.hp*(1+lv*.07));
   const u = { isMon:true, type:t, x:104, hp, hpMax:hp, atk:v.atk, spd:v.spd*(0.85+Math.random()*.3),
     size:v.size, nextHit:0, dead:false, el:null };
   u.el = mkUnit("mon", monsterSVG(t), u.x, hp);
@@ -1201,6 +1211,7 @@ function tick(){
 /* ================= 問答 ================= */
 function nextQuestion(){
   if(!S.running) return;
+  clearGuided();
   if(S.queue.length===0) S.queue=shuffle(BANK[S.level]);
   const [word,icon]=S.queue.shift();
   S.word=word; S.icon=icon;
@@ -1216,15 +1227,23 @@ function nextQuestion(){
   S.busy=false;
 }
 
+function clearGuided(){
+  S.guided=false;
+  const p=$("hintPtr"); if(p) p.remove();
+  document.querySelectorAll(".choice").forEach(b=>{ b.style.pointerEvents=""; });
+}
 async function answer(btn){
   if(S.busy || !S.running) return;
-  S.busy=true; $("choices").classList.add("locked");
   const picked=btn.dataset.word;
   const correct = picked===S.word;
+  if(S.guided && !correct) return;   // 引導中只接受正確答案
+  S.busy=true; $("choices").classList.add("locked");
   const buttons=[...document.querySelectorAll(".choice")];
   const rightBtn=buttons.find(b=>b.dataset.word===S.word);
 
   if(correct){
+    clearGuided();
+    btn.classList.remove("hint");
     btn.classList.add("right"); buttons.forEach(b=>{ if(b!==btn) b.classList.add("dim"); });
     sfx.right(); speakEn(S.word);
     S.learned.set(S.word,S.icon);
@@ -1233,16 +1252,20 @@ async function answer(btn){
     await wait(700);
     nextQuestion();
   } else {
-    btn.classList.add("wrong"); rightBtn.classList.add("right");
+    btn.classList.add("wrong");
     buttons.forEach(b=>{ if(b!==btn && b!==rightBtn) b.classList.add("dim"); });
     sfx.wrong();
-    await wait(350);
+    await wait(300);
     speakEn(itIsPhrase(picked));   // 講解揀錯嗰個係咩
-    await wait(1400);
+    await wait(1500);
     if(!S.running) return;
-    // 同一個字再問一次（重新洗選項位置）
-    S.queue.unshift([S.word,S.icon]);
-    nextQuestion();
+    // 引導糾正：正確答案發光跳動 + 手指指住，等小朋友撳
+    rightBtn.classList.add("hint");
+    const p=document.createElement("div"); p.id="hintPtr"; p.textContent="👇"; rightBtn.appendChild(p);
+    buttons.forEach(b=>{ if(b!==rightBtn) b.style.pointerEvents="none"; });
+    speakEn(wantPhrase(S.word));
+    S.guided=true; S.busy=false;
+    $("choices").classList.remove("locked");
   }
 }
 
