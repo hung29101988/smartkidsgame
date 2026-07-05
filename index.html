@@ -54,15 +54,15 @@
 
   /* 遊戲卡輪播 (carousel) */
   .carousel { position:relative; z-index:1; width:100%; max-width:760px;
-    --cardW:clamp(220px,74vw,360px); }
+    --cardW:clamp(150px,56vw,210px); --cgap:clamp(12px,2vw,20px); }
   .track {
-    display:flex; gap:4vmin; overflow-x:auto;
-    scroll-snap-type:x mandatory; scroll-behavior:smooth;
-    padding:2vmin calc((100% - var(--cardW))/2) 3vmin;
+    display:flex; gap:var(--cgap); overflow-x:auto;
+    scroll-snap-type:x proximity; scroll-behavior:smooth;
+    padding:2vmin var(--cgap) 3vmin; scroll-padding-left:var(--cgap);
     scrollbar-width:none; -webkit-overflow-scrolling:touch;
   }
   .track::-webkit-scrollbar { display:none; }
-  .carousel .card { flex:0 0 var(--cardW); scroll-snap-align:center; }
+  .carousel .card { flex:0 0 var(--cardW); scroll-snap-align:start; }
   /* 導航箭咀（電腦玩家用）*/
   .cbtn { position:absolute; top:46%; transform:translateY(-50%); z-index:4;
     width:clamp(42px,13vmin,58px); height:clamp(42px,13vmin,58px); border:none; cursor:pointer;
@@ -77,27 +77,27 @@
   @media(max-width:640px){ .cbtn { display:none; } }
   .card {
     display:flex; flex-direction:column; align-items:center; text-decoration:none;
-    background:#fffef6; border-radius:6vmin; padding:4vmin 3vmin 3.4vmin;
-    box-shadow:0 1.6vmin 0 rgba(0,0,0,.14); cursor:pointer;
-    transition:transform .12s, box-shadow .12s; border:.6vmin solid #fff;
+    background:#fffef6; border-radius:clamp(16px,6vmin,24px); padding:clamp(14px,4vmin,20px) clamp(12px,3vmin,16px) clamp(12px,3.4vmin,18px);
+    box-shadow:0 8px 0 rgba(0,0,0,.14); cursor:pointer;
+    transition:transform .12s, box-shadow .12s; border:3px solid #fff;
   }
   .card:active { transform:translateY(.8vmin); box-shadow:0 .8vmin 0 rgba(0,0,0,.14); }
-  .thumb { width:100%; aspect-ratio:1/1; border-radius:5vmin; overflow:hidden;
+  .thumb { width:100%; aspect-ratio:1/1; border-radius:clamp(12px,5vmin,18px); overflow:hidden;
     display:flex; align-items:center; justify-content:center; }
   .thumb svg { width:100%; height:100%; }
   .card .name { margin-top:2.4vmin; font-size:clamp(16px,4vmin,26px); line-height:1.15;
     font-weight:900; color:#4a3a26; text-align:center; white-space:nowrap; }
-  .playPill { margin-top:1.8vmin; display:inline-flex; align-items:center; justify-content:center;
-    width:12vmin; height:12vmin; border-radius:50%; padding-left:.8vmin;
+  .playPill { margin-top:1.6vmin; display:inline-flex; align-items:center; justify-content:center;
+    width:clamp(42px,12vmin,54px); height:clamp(42px,12vmin,54px); border-radius:50%; padding-left:.15em;
     background:linear-gradient(#8be78b,#2eaf5a); color:#fff;
-    font-size:5.6vmin; line-height:1;
-    box-shadow:0 .9vmin 0 #1d7c3d; }
+    font-size:clamp(19px,5.6vmin,25px); line-height:1;
+    box-shadow:0 5px 0 #1d7c3d; }
 
   /* 即將推出 */
   .card.soon { cursor:default; opacity:.92; }
   .card.soon:active { transform:none; box-shadow:0 1.6vmin 0 rgba(0,0,0,.14); }
   .thumb.coming { background:repeating-linear-gradient(45deg,#eef3e2 0 6vmin,#e4ecd2 6vmin 12vmin); }
-  .comingIcon { font-size:18vmin; opacity:.45; }
+  .comingIcon { font-size:clamp(48px,18vmin,84px); opacity:.45; }
   .card.soon .name { color:#9aa884; }
 
   /* 廣告位 */
