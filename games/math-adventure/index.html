@@ -622,13 +622,21 @@ function askQuestion(q){
 async function defeatAndJump(){
   const girl=$("girl"), monster=$("monster"), sprite=$("monsterSprite");
   sprite.classList.remove("idle");
+  // 即時量度女仔同怪獸嘅實際像素位置，用像素計跳躍距離
+  // （直向／橫向 aspect ratio 唔同都跳得啱，唔會跳唔到怪獸個頭）
+  const gb=girlBase();
+  const mr=monster.getBoundingClientRect();
+  const H=gb.height;
+  const dx=(mr.left+mr.width/2)-gb.cx;   // 女仔中心 → 怪獸中心 嘅橫向距離
+  const dyStomp=mr.top-gb.bottom;        // 女仔腳板 → 怪獸頭頂（負數，向上）
+  const px=v=>Math.round(v)+"px";
   girl.animate([
-    { transform:"translate(0,0)", offset:0 },
-    { transform:"translate(16vmin,-24vmin)", offset:.35 },   // 跳到最高，喺怪獸上方
-    { transform:"translate(28vmin,-12vmin)", offset:.55 },   // 落返嚟，隻腳掂到怪獸頭頂
-    { transform:"translate(31vmin,-21vmin)", offset:.66 },   // 踩一吓彈起
-    { transform:"translate(44vmin,-3vmin)", offset:.85 },    // 越過怪獸落地
-    { transform:"translate(0,0)", offset:1 }
+    { transform:`translate(0px,0px)`, offset:0 },
+    { transform:`translate(${px(dx*0.55)},${px(dyStomp-H*0.30)})`, offset:.35 },   // 跳到最高，喺怪獸上方
+    { transform:`translate(${px(dx)},${px(dyStomp)})`, offset:.55 },               // 落返嚟，隻腳掂到怪獸頭頂
+    { transform:`translate(${px(dx*1.04)},${px(dyStomp-H*0.28)})`, offset:.66 },   // 踩一吓彈起
+    { transform:`translate(${px(dx+mr.width*0.9)},0px)`, offset:.85 },             // 越過怪獸落地
+    { transform:`translate(0px,0px)`, offset:1 }
   ], { duration:1150, easing:"ease-in-out" });
   sfx.jump();
   await wait(630);   // 隻腳啱啱掂到怪獸頭頂 → 即刻開始壓扁
