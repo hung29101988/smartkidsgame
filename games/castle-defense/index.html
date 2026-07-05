@@ -387,9 +387,11 @@ const ICONS = {};
   const STEM = (x,y)=>`<path d="M${x} ${y} Q${x-1} ${y-9} ${x+4} ${y-14}" stroke="#7a5230" stroke-width="3.4" fill="none" stroke-linecap="round"/>`;
 
   ICONS.apple = fr(`<path d="M50 28 C32 22 21 38 23 57 C25 77 37 93 50 93 C63 93 75 77 77 57 C79 38 68 22 50 28 Z" fill="#e8453c" stroke="#a32424" stroke-width="2.5"/>${STEM(50,29)}${LEAF(53,20)}${HL(37,42,7,11)}`);
-  ICONS.banana = fr(`<path d="M46 30 Q30 34 26 52 Q22 74 40 90 Q52 98 64 92 Q48 84 44 64 Q42 46 54 34 Q51 28 46 30 Z" fill="#ffd34d" stroke="#c8922a" stroke-width="2.5"/>
-    <path d="M46 30 L50 24 Q54 22 56 26 L54 34" fill="#a3792a" stroke="#7a5a1a" stroke-width="1.6"/>
-    <ellipse cx="62" cy="60" rx="17" ry="22" fill="#ffe9a8" stroke="#c8922a" stroke-width="2.5"/>${HL(56,46,4,7)}`,60,.9,62);
+  ICONS.banana = fr(`<path d="M50 16 C40 17 34 26 32 42 C30 58 30 74 39 88 C43 92 47 93 50 93 C53 93 57 92 61 88 C70 74 70 58 68 42 C66 26 60 17 50 16 Z" fill="#ffd34d" stroke="#c8922a" stroke-width="2.5"/>
+    <path d="M47 18 L49 10 Q51 8 53 11 L52 19 Z" fill="#6e4a1e"/>
+    <path d="M47 91 Q50 96 53 91" stroke="#6e4a1e" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <path d="M41 26 Q37 58 44 87" stroke="#e8b93c" stroke-width="1.6" fill="none" opacity=".65"/>
+    <path d="M59 26 Q63 58 56 87" stroke="#e8b93c" stroke-width="1.6" fill="none" opacity=".65"/>${HL(40,36,5,10)}`,55,1,50);
   ICONS.orange = fr(`<circle cx="50" cy="59" r="30" fill="#ffa726" stroke="#c8711a" stroke-width="2.5"/>
     <path d="M44 30 L50 25 L56 30 L50 33 Z" fill="#5fbf3f" stroke="#3c7a2e" stroke-width="1.6"/>${HL(37,45,7,10)}
     <circle cx="30" cy="70" r="1.4" fill="#c8711a" opacity=".5"/><circle cx="68" cy="66" r="1.4" fill="#c8711a" opacity=".5"/><circle cx="62" cy="78" r="1.4" fill="#c8711a" opacity=".5"/>`);
