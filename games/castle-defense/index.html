@@ -901,11 +901,11 @@ function itIsPhrase(w){ if(NO_ARTICLE.has(w)) return "it is "+w;
 
 /* ================= 怪物（5 種，細→大）================= */
 const MTYPE = [
-  { body:"#8fd06e", light:"#c8f0a8", dark:"#467431", size:11, hp:3,  atk:1, spd:4.0, eyes:1, horns:1 },
-  { body:"#6fa8e8", light:"#b8d8f8", dark:"#33567e", size:13, hp:4,  atk:1, spd:2.8, eyes:2, horns:1 },
-  { body:"#e8c24a", light:"#f8e8a8", dark:"#8a6a1a", size:15, hp:6,  atk:1, spd:3.2, eyes:1, horns:2 },
-  { body:"#e88a6f", light:"#f8c8b8", dark:"#8e3a24", size:18, hp:8,  atk:2, spd:2.2, eyes:2, horns:2 },
-  { body:"#a97fd8", light:"#d8c0f0", dark:"#5a3a8e", size:22, hp:11, atk:2, spd:1.9, eyes:2, horns:3 },
+  { body:"#8fd06e", light:"#c8f0a8", dark:"#467431", size:11, hp:3,  atk:1, spd:4.6, eyes:1, horns:1 },
+  { body:"#6fa8e8", light:"#b8d8f8", dark:"#33567e", size:13, hp:5,  atk:1, spd:3.2, eyes:2, horns:1 },
+  { body:"#e8c24a", light:"#f8e8a8", dark:"#8a6a1a", size:15, hp:7,  atk:1, spd:3.7, eyes:1, horns:2 },
+  { body:"#e88a6f", light:"#f8c8b8", dark:"#8e3a24", size:18, hp:9,  atk:2, spd:2.6, eyes:2, horns:2 },
+  { body:"#a97fd8", light:"#d8c0f0", dark:"#5a3a8e", size:22, hp:13, atk:2, spd:2.2, eyes:2, horns:3 },
 ];
 function monsterSVG(t){
   const v=MTYPE[t], d=v.dark, u="m"+(_gid++);
@@ -1096,15 +1096,15 @@ function speakEn(text){ if(!("speechSynthesis" in window)) return; speechSynthes
 
 /* ================= 關卡設定 ================= */
 const LEVELS = [
-  { seq:[0,0,1,0,0,1,0,1],                    interval:7000, wall:12 },
-  { seq:[0,1,0,1,0,2,0,1,0,2],                interval:6400, wall:14 },
-  { seq:[1,0,2,1,0,2,1,2,0,2,1,2],            interval:6000, wall:14 },
-  { seq:[1,2,1,3,2,1,2,3,2,1,3,2],            interval:5600, wall:16 },
-  { seq:[2,1,3,2,3,1,2,3,2,4,2,3,3],          interval:5200, wall:16 },
-  { seq:[2,3,2,3,4,2,3,3,4,2,3,4,3,4],        interval:4800, wall:18 },
+  { seq:[0,0,1,0,1,0,1,0,1],                  interval:5800, wall:12 },
+  { seq:[0,1,0,1,0,2,0,1,2,0,2],              interval:5200, wall:13 },
+  { seq:[1,0,2,1,0,2,1,2,0,2,1,2],            interval:4800, wall:13 },
+  { seq:[1,2,1,3,2,1,2,3,2,1,3,2,3],          interval:4400, wall:14 },
+  { seq:[2,1,3,2,3,1,2,3,2,4,2,3,3,4],        interval:4000, wall:14 },
+  { seq:[2,3,2,3,4,2,3,3,4,2,3,4,3,4,4],      interval:3600, wall:16 },
 ];
 const ALLY = { hp:9, atk:3, spd:6.4, cd:550 };
-const MON_CD = 1000, WALL_CD = 1500;
+const MON_CD = 900, WALL_CD = 1400;
 
 /* ================= 遊戲狀態 ================= */
 const S = {
@@ -1160,7 +1160,7 @@ function killUnit(u){
 
 function spawnMonster(t){
   const v=MTYPE[t], lv=S.level;
-  const hp = Math.round(v.hp*(1+lv*.07));
+  const hp = Math.round(v.hp*(1+lv*.10));
   const u = { isMon:true, type:t, x:104, hp, hpMax:hp, atk:v.atk, spd:v.spd*(0.85+Math.random()*.3),
     size:v.size, nextHit:0, dead:false, el:null };
   u.el = mkUnit("mon", monsterSVG(t), u.x, hp);
