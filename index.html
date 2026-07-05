@@ -52,12 +52,29 @@
     padding:.06em .45em .12em .8em; margin-top:1.8vmin; display:inline-block; }
   .tagline { margin-top:2.6vmin; font-size:4.4vmin; font-weight:700; color:#5b7a2e; }
 
-  /* 遊戲卡片格 */
-  .grid {
-    z-index:1; width:100%; max-width:760px;
-    display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));
-    gap:4vmin;
+  /* 遊戲卡輪播 (carousel) */
+  .carousel { position:relative; z-index:1; width:100%; max-width:760px;
+    --cardW:clamp(220px,74vw,360px); }
+  .track {
+    display:flex; gap:4vmin; overflow-x:auto;
+    scroll-snap-type:x mandatory; scroll-behavior:smooth;
+    padding:2vmin calc((100% - var(--cardW))/2) 3vmin;
+    scrollbar-width:none; -webkit-overflow-scrolling:touch;
   }
+  .track::-webkit-scrollbar { display:none; }
+  .carousel .card { flex:0 0 var(--cardW); scroll-snap-align:center; }
+  /* 導航箭咀（電腦玩家用）*/
+  .cbtn { position:absolute; top:46%; transform:translateY(-50%); z-index:4;
+    width:clamp(42px,13vmin,58px); height:clamp(42px,13vmin,58px); border:none; cursor:pointer;
+    border-radius:50%; background:#fffef6; color:#4a3a26;
+    font-size:clamp(22px,7vmin,32px); font-weight:700; line-height:1;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 4px 0 rgba(0,0,0,.18); transition:opacity .2s, transform .08s; }
+  .cbtn.prev { left:1vmin; padding-right:.12em; }
+  .cbtn.next { right:1vmin; padding-left:.12em; }
+  .cbtn:active { transform:translateY(-50%) scale(.9); box-shadow:0 2px 0 rgba(0,0,0,.18); }
+  .cbtn[disabled] { opacity:0; pointer-events:none; }
+  @media(max-width:640px){ .cbtn { display:none; } }
   .card {
     display:flex; flex-direction:column; align-items:center; text-decoration:none;
     background:#fffef6; border-radius:6vmin; padding:4vmin 3vmin 3.4vmin;
@@ -151,8 +168,10 @@
     <div class="tagline">遊戲樂園 · 揀一個遊戲，開始學習吧！</div>
   </header>
 
-  <!-- 遊戲選單 -->
-  <main class="grid">
+  <!-- 遊戲選單 (輪播) -->
+  <section class="carousel" aria-label="遊戲選單">
+    <button class="cbtn prev" type="button" aria-label="上一個遊戲" onclick="slideGames(-1)">❮</button>
+    <main class="track" id="gameTrack">
 
     <!-- 識字小戰士 -->
     <a class="card" href="games/literacy-warrior/">
@@ -336,7 +355,9 @@
       <div class="name">敬請期待</div>
     </div>
 
-  </main>
+    </main>
+    <button class="cbtn next" type="button" aria-label="下一個遊戲" onclick="slideGames(1)">❯</button>
+  </section>
 
   <!-- 網站簡介 -->
   <section class="panel" aria-label="網站簡介">
@@ -402,6 +423,23 @@
     © smartkidsgame · 免費兒童學習遊戲<br>
     smartkidsgame.com — 認字、計數、學英文，喺玩之中成長。
   </footer>
+
+  <script>
+  (function(){
+    var track=document.getElementById('gameTrack');
+    if(!track) return;
+    var prev=document.querySelector('.cbtn.prev'), next=document.querySelector('.cbtn.next');
+    function stepW(){ var c=track.querySelector('.card'); var g=parseFloat(getComputedStyle(track).gap)||0;
+      return c ? c.getBoundingClientRect().width+g : track.clientWidth*0.8; }
+    window.slideGames=function(d){ track.scrollBy({left:d*stepW(), behavior:'smooth'}); };
+    function update(){ var max=track.scrollWidth-track.clientWidth-2;
+      if(prev) prev.disabled = track.scrollLeft<=2;
+      if(next) next.disabled = track.scrollLeft>=max; }
+    track.addEventListener('scroll', update, {passive:true});
+    window.addEventListener('resize', update);
+    update();
+  })();
+  </script>
 
 </body>
 </html>
