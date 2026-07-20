@@ -4,13 +4,18 @@
   <url><loc>https://smartkidsgame.com/about/</loc><priority>0.7</priority></url>
   <url><loc>https://smartkidsgame.com/contact/</loc><priority>0.5</priority></url>
   <url><loc>https://smartkidsgame.com/privacy/</loc><priority>0.4</priority></url>
-  <url><loc>https://smartkidsgame.com/guides/</loc><priority>0.8</priority></url>
+  <url><loc>https://smartkidsgame.com/guides/</loc><priority>0.9</priority></url>
+  <url><loc>https://smartkidsgame.com/guides/hk-preschool/</loc><priority>0.9</priority></url>
+  <url><loc>https://smartkidsgame.com/guides/hk-preschool/nursery/</loc><priority>0.8</priority></url>
+  <url><loc>https://smartkidsgame.com/guides/hk-preschool/k1/</loc><priority>0.8</priority></url>
+  <url><loc>https://smartkidsgame.com/guides/hk-preschool/k2/</loc><priority>0.8</priority></url>
+  <url><loc>https://smartkidsgame.com/guides/hk-preschool/k3/</loc><priority>0.8</priority></url>
   <url><loc>https://smartkidsgame.com/guides/learn-chinese/</loc><priority>0.8</priority></url>
   <url><loc>https://smartkidsgame.com/guides/learn-english/</loc><priority>0.8</priority></url>
   <url><loc>https://smartkidsgame.com/guides/learn-math/</loc><priority>0.8</priority></url>
   <url><loc>https://smartkidsgame.com/guides/screen-time/</loc><priority>0.8</priority></url>
-  <url><loc>https://smartkidsgame.com/games/literacy-warrior/</loc><priority>0.9</priority></url>
-  <url><loc>https://smartkidsgame.com/games/math-adventure/</loc><priority>0.9</priority></url>
-  <url><loc>https://smartkidsgame.com/games/english-fighter/</loc><priority>0.9</priority></url>
-  <url><loc>https://smartkidsgame.com/games/castle-defense/</loc><priority>0.9</priority></url>
+  <url><loc>https://smartkidsgame.com/games/literacy-warrior/</loc><priority>0.6</priority></url>
+  <url><loc>https://smartkidsgame.com/games/math-adventure/</loc><priority>0.6</priority></url>
+  <url><loc>https://smartkidsgame.com/games/english-fighter/</loc><priority>0.6</priority></url>
+  <url><loc>https://smartkidsgame.com/games/castle-defense/</loc><priority>0.6</priority></url>
 </urlset>
