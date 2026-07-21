@@ -7,12 +7,13 @@ K1 中文字卡 — MiniMax 批量生圖
 - 已經有嘅圖會跳過（重跑唔會嘥 token）。
 用法：  python3 gen_cards.py
 """
-import os, sys, json, time, urllib.request, urllib.error
+import os, sys, json, time, base64, urllib.request, urllib.error
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 IMG_DIR = os.path.join(HERE, "img")
 KEY_FILE = os.path.join(HERE, ".minimax_key")
-API_URL = os.environ.get("MINIMAX_URL", "https://api.minimax.io/v1/image_generation")
+# 國內版（minimaxi.com）；國際版係 api.minimax.io。可用環境變數 MINIMAX_URL 覆蓋。
+API_URL = os.environ.get("MINIMAX_URL", "https://api.minimaxi.com/v1/image_generation")
 
 STYLE = ("Cute simple cartoon illustration for a preschool flashcard, {subj}, "
          "single clear subject, centered, plain soft pastel background, thick clean "
@@ -75,7 +76,7 @@ def existing(num):
             return p
     return None
 
-def generate(key, subj):
+def fetch_and_save(key, num, subj):
     body = json.dumps({
         "model": "image-01",
         "prompt": STYLE.format(subj=subj),
@@ -88,24 +89,26 @@ def generate(key, subj):
         "Content-Type": "application/json",
         "Authorization": "Bearer " + key,
     })
-    with urllib.request.urlopen(req, timeout=120) as r:
+    with urllib.request.urlopen(req, timeout=180) as r:
         res = json.loads(r.read().decode("utf-8"))
-    br = res.get("base_resp", {})
+    br = res.get("base_resp", {}) or {}
     if br.get("status_code", 0) not in (0, None):
-        raise RuntimeError("API: " + str(br.get("status_msg")))
-    urls = (res.get("data") or {}).get("image_urls") or []
-    if not urls:
-        raise RuntimeError("冇 image_urls；回應：" + json.dumps(res)[:200])
-    return urls[0]
-
-def download(url, num):
-    with urllib.request.urlopen(url, timeout=120) as r:
-        ct = (r.headers.get("Content-Type") or "").lower()
-        data = r.read()
-    ext = "png" if "png" in ct else ("webp" if "webp" in ct else "jpg")
+        raise RuntimeError("API " + str(br.get("status_code")) + ": " + str(br.get("status_msg")))
+    data = res.get("data") or {}
+    urls = data.get("image_urls") or []
+    b64s = data.get("image_base64") or []
+    if urls:                       # response_format=url
+        with urllib.request.urlopen(urls[0], timeout=180) as r:
+            ct = (r.headers.get("Content-Type") or "").lower()
+            raw = r.read()
+        ext = "png" if "png" in ct else ("webp" if "webp" in ct else "jpg")
+    elif b64s:                     # 有啲情況回 base64
+        raw = base64.b64decode(b64s[0]); ext = "jpg"
+    else:
+        raise RuntimeError("冇圖回應：" + json.dumps(res, ensure_ascii=False)[:200])
     path = os.path.join(IMG_DIR, num + "." + ext)
     with open(path, "wb") as f:
-        f.write(data)
+        f.write(raw)
     return path
 
 def main():
@@ -118,8 +121,7 @@ def main():
             skip += 1
             continue
         try:
-            url = generate(key, subj)
-            path = download(url, num)
+            path = fetch_and_save(key, num, subj)
             print(f"  {num} {char}  ✓  {os.path.basename(path)}")
             done += 1
             time.sleep(1.5)   # 溫和啲，避免撞 rate limit
