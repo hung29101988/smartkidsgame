@@ -131,7 +131,12 @@ function speak(t){
 /* 載入一張卡（圖用 img/NN.png，冇就用 emoji）*/
 function render(){
   const d = DECK[idx];
+  // 即時 snap 返正面（唔做翻轉動畫），避免閃到下一張嘅字面
+  const inner = card.querySelector(".inner");
+  inner.style.transition = "none";
   card.classList.remove("flipped");
+  void inner.offsetWidth;        // 強制 reflow 鎖定正面
+  inner.style.transition = "";   // 還原動畫，之後撥先至翻轉
   zi.textContent = d.c;
   counter.textContent = (idx+1) + " / " + DECK.length;
   // 圖：試 img/NN.png，load 唔到 fallback emoji
