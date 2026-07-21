@@ -1,0 +1,56 @@
+K1 中文字卡 — MiniMax 生圖 Prompt 清單
+=======================================
+
+用法：
+- 每張圖用 MiniMax（image-01 / Hailuo）生成，比例 1:1（正方形）。
+- 存做對應檔名（01.png、02.png … 37.png），放入呢個 img 資料夾。
+- 檔案要係 .png（或者將 index.html 內 "img/xx.png" 改成你用嘅格式）。
+- 未放圖之前，程式會自動用 emoji 頂住，照玩到。
+
+建議統一風格（可加喺每個 prompt 前面）：
+「Cute simple cartoon illustration for a preschool flashcard, {主體}, single clear subject, centered, plain soft pastel background, thick clean outlines, bright kid-friendly colours, no text, no letters, no words.」
+
+--- 數字（用數量表達）---
+01.png  一 — one big red apple
+02.png  二 — two yellow rubber ducks
+03.png  三 — three red apples in a row
+04.png  四 — four colourful balloons
+05.png  五 — five yellow stars
+06.png  六 — six little orange fish
+07.png  七 — seven pink flowers
+08.png  八 — eight purple grapes
+09.png  九 — nine round candies
+10.png  十 — ten coloured pencils
+
+--- 身體 ---
+11.png  口 — a smiling child's open mouth, cartoon
+12.png  手 — a child's open hand waving hello
+13.png  耳 — a cute cartoon ear
+14.png  目 — one big friendly cartoon eye
+15.png  心 — a red love heart
+16.png  足 — a child's cute bare foot
+
+--- 大自然・天氣 ---
+17.png  日 — a bright smiling sun
+18.png  月 — a crescent moon in a night sky with stars
+19.png  山 — a green mountain with a peak
+20.png  水 — a clear glass of water with a big water drop
+21.png  火 — a small friendly campfire flame
+22.png  木 — a single green tree
+23.png  石 — a smooth grey rock / stone
+24.png  天 — blue sky with fluffy white clouds
+25.png  雨 — a rain cloud with blue raindrops
+26.png  花 — a single pink flower
+27.png  草 — a patch of green grass
+
+--- 自己・家人・方位 ---
+28.png  人 — a cute cartoon child standing, front view
+29.png  大 — a big grey elephant (to show "big")
+30.png  小 — a tiny cute mouse (to show "small")
+31.png  上 — a bird flying UP high with an up arrow
+32.png  下 — a ball falling DOWN with a down arrow
+33.png  中 — a target / bullseye with an object in the centre
+34.png  爸 — a friendly cartoon dad (father)
+35.png  媽 — a friendly cartoon mum (mother)
+36.png  哥 — a cartoon older brother (a bigger boy)
+37.png  姐 — a cartoon older sister (a bigger girl)
