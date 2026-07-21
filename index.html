@@ -20,15 +20,15 @@
   html,body { min-height:100%; }
   body {
     font-family:"PingFang HK","PingFang TC","Heiti TC","Microsoft JhengHei",sans-serif;
-    background: linear-gradient(#aee7ff 0%, #d8f4ff 42%, #c7eea0 42%, #9fd96f 100%);
-    background-attachment:fixed;
+    background: linear-gradient(#aee7ff 0, #d8f4ff 32vh, #c7eea0 32vh, #9fd96f 56vh);
+    background-color:#9fd96f; background-repeat:no-repeat;
     min-height:100vh; min-height:100dvh;
     display:flex; flex-direction:column; align-items:center;
     padding:5vmin 4vmin 8vmin; gap:4vmin; overflow-x:hidden;
   }
 
   /* 飄雲 */
-  .cloud { position:fixed; background:#fff; border-radius:50vmin; opacity:.8; z-index:0; pointer-events:none; }
+  .cloud { position:absolute; background:#fff; border-radius:50vmin; opacity:.8; z-index:0; pointer-events:none; }
   .cloud::before{ content:""; position:absolute; background:#fff; border-radius:50%; }
   .cl1{ width:18vmin; height:6vmin; top:6%; left:-20vmin; animation:drift 40s linear infinite; }
   .cl1::before{ width:8vmin; height:8vmin; top:-3.5vmin; left:3vmin; }
