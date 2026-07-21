@@ -111,7 +111,7 @@ const pad = n => String(n+1).padStart(2,"0");
 
 const $ = id => document.getElementById(id);
 const card = $("card"), pic = $("pic"), zi = $("zi"), counter = $("counter");
-let idx = 0;
+let idx = 0, renderToken = 0;
 
 /* 廣東話讀音 */
 let voice = null;
@@ -140,12 +140,20 @@ function render(){
   zi.textContent = d.c;
   counter.textContent = (idx+1) + " / " + DECK.length;
   // 圖：試 img/NN.png，load 唔到 fallback emoji
-  pic.innerHTML = "";
-  const img = new Image();
-  img.alt = d.c;
-  img.onload = ()=>{ pic.innerHTML=""; pic.appendChild(img); };
-  img.onerror = ()=>{ pic.innerHTML = '<div class="emoji">'+d.e+'</div>'; };
-  img.src = "img/" + pad(idx) + ".png";
+  // 圖：試 img/NN.jpg → .png → .webp，載到就換走 emoji；全部冇就留 emoji
+  const myTok = ++renderToken;
+  const num = pad(idx);
+  pic.innerHTML = '<div class="emoji">'+d.e+'</div>';
+  const exts = ["jpg","png","webp","jpeg"];
+  let ei = 0;
+  const tryImg = ()=>{
+    if(ei>=exts.length || myTok!==renderToken) return;
+    const img = new Image(); img.alt = d.c;
+    img.onload = ()=>{ if(myTok!==renderToken) return; pic.innerHTML=""; pic.appendChild(img); };
+    img.onerror = ()=>{ ei++; tryImg(); };
+    img.src = "img/" + num + "." + exts[ei];
+  };
+  tryImg();
   $("prevBtn").disabled = (idx===0);
   $("nextBtn").disabled = (idx===DECK.length-1);
 }

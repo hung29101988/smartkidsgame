@@ -1,2 +1,6 @@
 .claude/
 .DS_Store
+
+# MiniMax API key（唔好上傳）
+games/flashcard-k1/.minimax_key
+*.key
