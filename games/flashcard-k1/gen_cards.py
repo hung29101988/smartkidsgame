@@ -7,7 +7,7 @@ K1 中文字卡 — MiniMax 批量生圖
 - 已經有嘅圖會跳過（重跑唔會嘥 token）。
 用法：  python3 gen_cards.py
 """
-import os, sys, json, time, base64, urllib.request, urllib.error
+import os, sys, json, time, base64, subprocess, tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 IMG_DIR = os.path.join(HERE, "img")
@@ -15,47 +15,51 @@ KEY_FILE = os.path.join(HERE, ".minimax_key")
 # 國內版（minimaxi.com）；國際版係 api.minimax.io。可用環境變數 MINIMAX_URL 覆蓋。
 API_URL = os.environ.get("MINIMAX_URL", "https://api.minimaxi.com/v1/image_generation")
 
-STYLE = ("Cute simple cartoon illustration for a preschool flashcard, {subj}, "
-         "single clear subject, centered, plain soft pastel background, thick clean "
-         "outlines, bright kid-friendly colours, no text, no letters, no words.")
+STYLE = ("A bright, colourful, realistic and true-to-life picture of {subj}, "
+         "high quality, clear and recognisable, single subject centered on a clean simple "
+         "plain light background, natural lifelike appearance with rich vibrant colours, "
+         "suitable as a learning flashcard for young kids. "
+         "IMPORTANT: this is a REALISTIC depiction, NOT a cartoon character; do NOT add any "
+         "eyes, face, smile or human features to objects, food, sun, moon, plants or animals' surroundings. "
+         "No text, no letters, no numbers, no words, no watermark.")
 
 # (檔案序號, 中文字, 圖畫主體)
 CARDS = [
-    ("01","一","one single big red apple"),
-    ("02","二","two yellow rubber ducks"),
-    ("03","三","three red apples in a row"),
-    ("04","四","four colourful balloons"),
-    ("05","五","five yellow stars"),
-    ("06","六","six little orange fish"),
-    ("07","七","seven pink flowers"),
-    ("08","八","eight purple grapes"),
-    ("09","九","nine round colourful candies"),
-    ("10","十","ten coloured pencils in a row"),
-    ("11","口","a smiling child's open mouth"),
-    ("12","手","a child's open hand waving hello"),
-    ("13","耳","a single cute cartoon ear"),
-    ("14","目","one big friendly cartoon eye"),
-    ("15","心","a single red love heart"),
-    ("16","足","a child's cute bare foot"),
-    ("17","日","a bright smiling sun"),
+    ("01","一","exactly ONE single red apple, one apple only, centered, clearly one item"),
+    ("02","二","exactly TWO identical red apples placed side by side, two apples only, clearly separated and easy to count"),
+    ("03","三","exactly THREE identical red apples in a neat straight row, three apples only, clearly separated and easy to count"),
+    ("04","四","exactly FOUR identical yellow rubber ducks in a neat straight row, four ducks only, clearly separated and easy to count"),
+    ("05","五","exactly FIVE identical yellow stars in a neat straight row, five stars only, clearly separated and easy to count"),
+    ("06","六","exactly SIX identical red strawberries arranged in two neat rows of three, six strawberries only, clearly separated and easy to count"),
+    ("07","七","exactly SEVEN identical red apples, arranged as a top row of FOUR apples and a bottom row of THREE apples (4 plus 3 makes seven), clearly separated, exactly seven apples and no more"),
+    ("08","八","exactly EIGHT identical orange oranges, arranged as a top row of FOUR oranges and a bottom row of FOUR oranges, clearly separated, exactly eight oranges, not nine"),
+    ("09","九","exactly NINE identical round colourful candies arranged in three neat rows of three, nine candies only, clearly separated and easy to count"),
+    ("10","十","exactly TEN identical yellow lemons, arranged as a top row of FIVE lemons and a bottom row of FIVE lemons, clearly separated, exactly ten lemons, not twelve"),
+    ("11","口","a realistic close-up of a young child's mouth and lips"),
+    ("12","手","a young child's open hand, palm facing forward, realistic"),
+    ("13","耳","a realistic close-up of a young child's ear"),
+    ("14","目","a realistic close-up of a young child's eye"),
+    ("15","心","a single simple red love-heart shape, flat and clean, no face"),
+    ("16","足","a young child's bare foot, realistic"),
+    ("17","日","a bright shining sun in a clear blue sky, realistic, no face"),
     ("18","月","a crescent moon in a night sky with a few stars"),
     ("19","山","a green mountain with a peak"),
     ("20","水","a clear glass of water with a big water drop"),
-    ("21","火","a small friendly campfire flame"),
+    ("21","火","a realistic small campfire with orange flames"),
     ("22","木","a single green tree"),
     ("23","石","a smooth grey rock stone"),
     ("24","天","a blue sky with fluffy white clouds"),
     ("25","雨","a rain cloud with blue raindrops"),
     ("26","花","a single pink flower"),
     ("27","草","a patch of green grass"),
-    ("28","人","a cute cartoon child standing, front view"),
+    ("28","人","a young child standing, front view, realistic"),
     ("29","大","a big grey elephant"),
     ("30","小","a tiny cute grey mouse"),
     ("31","上","a bird flying up high with an upward arrow"),
     ("32","下","a ball falling down with a downward arrow"),
     ("33","中","a target bullseye with an object in the centre"),
     ("34","爸","a friendly cartoon dad, father, front view"),
-    ("35","媽","a friendly cartoon mum, mother, front view"),
+    ("35","媽","a warm friendly adult woman, a mother about 35 years old, gentle smile, head and shoulders portrait, clearly a grown-up woman not a child, front view, realistic"),
     ("36","哥","a cartoon older brother, a bigger boy"),
     ("37","姐","a cartoon older sister, a bigger girl"),
 ]
@@ -76,39 +80,61 @@ def existing(num):
             return p
     return None
 
+def _api_post(key, payload):
+    # key 放喺臨時 curl config 檔（-K），唔會出現喺程序參數
+    cfg = tempfile.NamedTemporaryFile("w", suffix=".curlcfg", delete=False, encoding="utf-8")
+    try:
+        cfg.write('header = "Authorization: Bearer %s"\n' % key)
+        cfg.write('header = "Content-Type: application/json"\n')
+        cfg.close(); os.chmod(cfg.name, 0o600)
+        p = subprocess.run(
+            ["curl", "-sS", "-K", cfg.name, "-X", "POST", API_URL, "--data-binary", "@-"],
+            input=json.dumps(payload).encode("utf-8"),
+            capture_output=True, timeout=180)
+    finally:
+        try: os.unlink(cfg.name)
+        except OSError: pass
+    if p.returncode != 0:
+        raise RuntimeError("curl %d: %s" % (p.returncode, (p.stderr or b"").decode()[:200]))
+    return json.loads(p.stdout.decode("utf-8"))
+
+def _download(url):
+    fd, tmp = tempfile.mkstemp(suffix=".img"); os.close(fd)
+    p = subprocess.run(["curl", "-sS", "-L", "-o", tmp, url], capture_output=True, timeout=180)
+    if p.returncode != 0:
+        raise RuntimeError("下載失敗 curl %d: %s" % (p.returncode, (p.stderr or b"").decode()[:200]))
+    with open(tmp, "rb") as f: head = f.read(16)
+    if head[:3] == b"\xff\xd8\xff": ext = "jpg"
+    elif head[:8] == b"\x89PNG\r\n\x1a\n": ext = "png"
+    elif head[:4] == b"RIFF" and head[8:12] == b"WEBP": ext = "webp"
+    else: ext = "jpg"
+    return tmp, ext
+
 def fetch_and_save(key, num, subj):
-    body = json.dumps({
+    res = _api_post(key, {
         "model": "image-01",
         "prompt": STYLE.format(subj=subj),
         "aspect_ratio": "1:1",
         "response_format": "url",
         "n": 1,
         "prompt_optimizer": True,
-    }).encode("utf-8")
-    req = urllib.request.Request(API_URL, data=body, method="POST", headers={
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + key,
     })
-    with urllib.request.urlopen(req, timeout=180) as r:
-        res = json.loads(r.read().decode("utf-8"))
     br = res.get("base_resp", {}) or {}
     if br.get("status_code", 0) not in (0, None):
         raise RuntimeError("API " + str(br.get("status_code")) + ": " + str(br.get("status_msg")))
     data = res.get("data") or {}
     urls = data.get("image_urls") or []
     b64s = data.get("image_base64") or []
-    if urls:                       # response_format=url
-        with urllib.request.urlopen(urls[0], timeout=180) as r:
-            ct = (r.headers.get("Content-Type") or "").lower()
-            raw = r.read()
-        ext = "png" if "png" in ct else ("webp" if "webp" in ct else "jpg")
-    elif b64s:                     # 有啲情況回 base64
-        raw = base64.b64decode(b64s[0]); ext = "jpg"
+    if urls:
+        tmp, ext = _download(urls[0])
+        path = os.path.join(IMG_DIR, num + "." + ext)
+        os.replace(tmp, path)
+    elif b64s:
+        raw = base64.b64decode(b64s[0])
+        path = os.path.join(IMG_DIR, num + ".jpg")
+        with open(path, "wb") as f: f.write(raw)
     else:
         raise RuntimeError("冇圖回應：" + json.dumps(res, ensure_ascii=False)[:200])
-    path = os.path.join(IMG_DIR, num + "." + ext)
-    with open(path, "wb") as f:
-        f.write(raw)
     return path
 
 def main():
@@ -125,9 +151,6 @@ def main():
             print(f"  {num} {char}  ✓  {os.path.basename(path)}")
             done += 1
             time.sleep(1.5)   # 溫和啲，避免撞 rate limit
-        except urllib.error.HTTPError as e:
-            print(f"  {num} {char}  ✗  HTTP {e.code} {e.read()[:120]!r}")
-            fail += 1
         except Exception as e:
             print(f"  {num} {char}  ✗  {e}")
             fail += 1

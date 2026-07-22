@@ -4,3 +4,7 @@
 # MiniMax API key（唔好上傳）
 games/flashcard-k1/.minimax_key
 *.key
+
+# 字卡拼砌素材（唔上傳）
+games/flashcard-k1/img/_*
+__pycache__/
