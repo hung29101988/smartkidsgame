@@ -81,11 +81,11 @@
       <div class="face front">
         <button class="say" id="sayBtn" aria-label="讀多次">🔊</button>
         <div class="pic" id="pic"></div>
-        <div class="hint">👆 撳一下 / 撥一下睇個字</div>
+        <div class="hint">👉 向右撥（或撳一下）睇個字</div>
       </div>
       <div class="face back">
         <div class="zi" id="zi">字</div>
-        <div class="hint">再撥一下 / 撳一下 → 下一張 ▶</div>
+        <div class="hint">👉 向右：下一張 ・ 👈 向左：睇返圖</div>
       </div>
     </div>
   </div>
@@ -161,12 +161,20 @@ function render(){
   speak(d.c);   // 出圖即讀（意思 + 聲音）；翻到字唔讀
 }
 
-/* 撥/撳一下：未翻 → 反轉睇字；已翻 → 跳去下一張卡（又係圖）*/
-function advance(){
+/* 向右（前進）：圖 → 翻到字；字 → 下一張卡（圖）*/
+function fwd(){
   if(!card.classList.contains("flipped")){
     card.classList.add("flipped");
   } else if(idx < DECK.length-1){
     idx++; render();
+  }
+}
+/* 向左（後退）：字 → 揭返去圖（同一張）；圖 → 上一張卡 */
+function back(){
+  if(card.classList.contains("flipped")){
+    card.classList.remove("flipped"); speak(DECK[idx].c);
+  } else if(idx > 0){
+    idx--; render();
   }
 }
 function go(step){
@@ -175,28 +183,29 @@ function go(step){
   idx = n; render();
 }
 
-/* 撳一下 = 反轉 / 下一張 */
-card.addEventListener("click", (e)=>{ if(justSwiped) return; advance(); });
+/* 撳一下 = 前進（同向右）*/
+card.addEventListener("click", (e)=>{ if(justSwiped) return; fwd(); });
 $("sayBtn").addEventListener("click", (e)=>{ e.stopPropagation(); speak(DECK[idx].c); });
 
-/* 撥（swipe）：左右撥 = 反轉 / 下一張；上下撥忽略 */
+/* 撥（swipe）：向右 = 前進，向左 = 後退；上下撥忽略 */
 let sx=0, sy=0, justSwiped=false;
 card.addEventListener("pointerdown", e=>{ sx=e.clientX; sy=e.clientY; });
 card.addEventListener("pointerup", e=>{
   const dx=e.clientX-sx, dy=e.clientY-sy;
   if(Math.abs(dx)>45 && Math.abs(dx)>Math.abs(dy)){
-    justSwiped=true; advance(); setTimeout(()=>justSwiped=false,450);
+    justSwiped=true; setTimeout(()=>justSwiped=false,450);
+    if(dx>0) fwd(); else back();
   }
 });
 
-/* nav 掣：明確揭上／下一張 */
+/* nav 掣：明確揭上／下一張卡 */
 $("prevBtn").addEventListener("click", ()=>go(-1));
 $("nextBtn").addEventListener("click", ()=>go(1));
 
-/* 鍵盤：→/空白/↓ = 反轉或下一張；← = 上一張 */
+/* 鍵盤：→/空白 = 前進；← = 後退 */
 window.addEventListener("keydown", e=>{
-  if(e.key==="ArrowLeft"){ go(-1); }
-  else if(e.key==="ArrowRight"||e.key===" "||e.key==="ArrowDown"||e.key==="ArrowUp"){ e.preventDefault(); advance(); }
+  if(e.key==="ArrowLeft"){ e.preventDefault(); back(); }
+  else if(e.key==="ArrowRight"||e.key===" "||e.key==="ArrowDown"){ e.preventDefault(); fwd(); }
 });
 
 // 開場預載全部圖，令揭卡即時、無閃
