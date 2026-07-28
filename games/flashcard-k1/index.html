@@ -47,10 +47,10 @@
   .back { transform:rotateY(180deg); background:#fff7e6; }
   .back .zi { font-family:"PingFang HK","PingFang TC","Heiti TC",serif; font-weight:900; color:#c0392b;
     font-size:min(52vmin,340px); line-height:1; }
-  .back .say { position:absolute; top:3vmin; right:3vmin; width:12vmin; height:12vmin; max-width:64px; max-height:64px;
+  .say { position:absolute; top:3vmin; right:3vmin; width:12vmin; height:12vmin; max-width:64px; max-height:64px;
     border:none; border-radius:50%; background:#8bd47a; color:#fff; font-size:6vmin; line-height:1;
-    box-shadow:0 .8vmin 0 #5ca046; display:flex; align-items:center; justify-content:center; cursor:pointer; }
-  .back .say:active { transform:translateY(.4vmin); }
+    box-shadow:0 .8vmin 0 #5ca046; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:3; }
+  .say:active { transform:translateY(.4vmin); }
   .back .hint { color:#d6a24a; }
 
   /* 底 nav */
@@ -79,11 +79,11 @@
   <div class="card" id="card">
     <div class="inner">
       <div class="face front">
+        <button class="say" id="sayBtn" aria-label="讀多次">🔊</button>
         <div class="pic" id="pic"></div>
         <div class="hint">👆 撳一下 / 撥一下睇個字</div>
       </div>
       <div class="face back">
-        <button class="say" id="sayBtn" aria-label="讀多次">🔊</button>
         <div class="zi" id="zi">字</div>
         <div class="hint">再撥一下 / 撳一下 → 下一張 ▶</div>
       </div>
@@ -158,12 +158,13 @@ function render(){
   tryImg();
   $("prevBtn").disabled = (idx===0);
   $("nextBtn").disabled = (idx===DECK.length-1);
+  speak(d.c);   // 出圖即讀（意思 + 聲音）；翻到字唔讀
 }
 
 /* 撥/撳一下：未翻 → 反轉睇字；已翻 → 跳去下一張卡（又係圖）*/
 function advance(){
   if(!card.classList.contains("flipped")){
-    card.classList.add("flipped"); speak(DECK[idx].c);
+    card.classList.add("flipped");
   } else if(idx < DECK.length-1){
     idx++; render();
   }
