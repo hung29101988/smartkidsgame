@@ -140,18 +140,20 @@ function render(){
   zi.textContent = d.c;
   counter.textContent = (idx+1) + " / " + DECK.length;
   // 圖：試 img/NN.png，load 唔到 fallback emoji
-  // 圖：試 img/NN.jpg → .png → .webp，載到就換走 emoji；全部冇就留 emoji
+  // 圖：cache 到就即刻換（零閃）；未 cache 先保留住舊圖，載完先換；全部冇先用 emoji
   const myTok = ++renderToken;
   const num = pad(idx);
-  pic.innerHTML = '<div class="emoji">'+d.e+'</div>';
   const exts = ["jpg","png","webp","jpeg"];
   let ei = 0;
+  const show = el => { if(myTok===renderToken){ pic.innerHTML=""; pic.appendChild(el); } };
   const tryImg = ()=>{
-    if(ei>=exts.length || myTok!==renderToken) return;
+    if(myTok!==renderToken) return;
+    if(ei>=exts.length){ const e=document.createElement("div"); e.className="emoji"; e.textContent=d.e; show(e); return; }
     const img = new Image(); img.alt = d.c;
-    img.onload = ()=>{ if(myTok!==renderToken) return; pic.innerHTML=""; pic.appendChild(img); };
-    img.onerror = ()=>{ ei++; tryImg(); };
     img.src = "img/" + num + "." + exts[ei];
+    if(img.complete && img.naturalWidth){ show(img); return; }   // 已 cache → 即刻，無閃
+    img.onload = ()=>show(img);
+    img.onerror = ()=>{ ei++; tryImg(); };
   };
   tryImg();
   $("prevBtn").disabled = (idx===0);
@@ -195,6 +197,9 @@ window.addEventListener("keydown", e=>{
   if(e.key==="ArrowLeft"){ go(-1); }
   else if(e.key==="ArrowRight"||e.key===" "||e.key==="ArrowDown"||e.key==="ArrowUp"){ e.preventDefault(); advance(); }
 });
+
+// 開場預載全部圖，令揭卡即時、無閃
+DECK.forEach((_,i)=>{ const im=new Image(); im.src="img/"+pad(i)+".jpg"; });
 
 render();
 </script>
