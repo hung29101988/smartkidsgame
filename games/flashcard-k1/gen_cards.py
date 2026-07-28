@@ -60,8 +60,8 @@ CARDS = [
     ("33","中","three identical same-size balls stacked in a vertical column on a plain white background, the MIDDLE ball bright red, the top and bottom balls plain grey, soft natural shadows"),
     ("34","爸","an East Asian Chinese adult man, a father about 35 years old, black hair, warm friendly smile, head and shoulders portrait, front view, realistic"),
     ("35","媽","an East Asian Chinese adult woman, a mother about 35 years old, black hair, gentle warm smile, clearly a grown-up woman not a child, head and shoulders portrait, front view, realistic"),
-    ("36","哥","an East Asian Chinese older brother, a boy about 8 years old, black hair, warm tan skin, friendly, head and shoulders portrait, front view, realistic"),
-    ("37","姐","an East Asian Chinese older sister, a girl about 8 years old, black hair, warm tan skin, friendly, head and shoulders portrait, front view, realistic"),
+    ("36","哥","an East Asian Chinese older brother, a teenage boy about 13 to 14 years old, black hair, warm tan skin, friendly, head and shoulders portrait, front view, realistic"),
+    ("37","姐","an East Asian Chinese older sister, a teenage girl about 13 to 14 years old, black hair, warm tan skin, friendly, head and shoulders portrait, front view, realistic"),
 ]
 
 def load_key():
