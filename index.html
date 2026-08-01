@@ -52,6 +52,10 @@
     padding:.06em .45em .12em .8em; margin-top:1.8vmin; display:inline-block; }
   .tagline { margin-top:2.6vmin; font-size:4.4vmin; font-weight:700; color:#5b7a2e; }
 
+  /* 分類標題 */
+  .sectitle { z-index:1; width:100%; max-width:760px; margin:1vmin auto -1.5vmin;
+    padding-left:3vmin; font-weight:900; color:#4a6a1e; font-size:clamp(19px,5.2vmin,27px); }
+
   /* 遊戲卡輪播 (carousel) */
   .carousel { position:relative; z-index:1; width:100%; max-width:760px;
     --cardW:clamp(150px,56vw,210px); --cgap:clamp(12px,2vw,20px); }
@@ -168,10 +172,11 @@
     <div class="tagline">遊戲樂園 · 揀一個遊戲，開始學習吧！</div>
   </header>
 
-  <!-- 遊戲選單 (輪播) -->
-  <section class="carousel" aria-label="遊戲選單">
-    <button class="cbtn prev" type="button" aria-label="上一個遊戲" onclick="slideGames(-1)">❮</button>
-    <main class="track" id="gameTrack">
+  <!-- 遊戲 -->
+  <h2 class="sectitle">🎮 遊戲</h2>
+  <section class="carousel" aria-label="遊戲">
+    <button class="cbtn prev" type="button" aria-label="上一個">❮</button>
+    <div class="track">
 
     <!-- 識字小戰士 -->
     <a class="card" href="games/literacy-warrior/">
@@ -349,6 +354,22 @@
       <span class="playPill">▶</span>
     </a>
 
+    <!-- 即將推出 -->
+    <div class="card soon">
+      <div class="thumb coming"><span class="comingIcon">➕</span></div>
+      <div class="name">敬請期待</div>
+    </div>
+
+    </div>
+    <button class="cbtn next" type="button" aria-label="下一個">❯</button>
+  </section>
+
+  <!-- 字卡 -->
+  <h2 class="sectitle">🃏 字卡</h2>
+  <section class="carousel" aria-label="字卡">
+    <button class="cbtn prev" type="button" aria-label="上一個">❮</button>
+    <div class="track">
+
     <!-- K1 中文字卡 -->
     <a class="card" href="games/flashcard-k1/">
       <div class="thumb" style="position:relative">
@@ -388,14 +409,14 @@
       <span class="playPill">▶</span>
     </a>
 
-    <!-- 即將推出（佔位，將來加新遊戲換走呢張） -->
+    <!-- 更多字卡陸續有 -->
     <div class="card soon">
       <div class="thumb coming"><span class="comingIcon">➕</span></div>
       <div class="name">敬請期待</div>
     </div>
 
-    </main>
-    <button class="cbtn next" type="button" aria-label="下一個遊戲" onclick="slideGames(1)">❯</button>
+    </div>
+    <button class="cbtn next" type="button" aria-label="下一個">❯</button>
   </section>
 
   <!-- 網站簡介 -->
@@ -472,20 +493,22 @@
   </footer>
 
   <script>
-  (function(){
-    var track=document.getElementById('gameTrack');
+  document.querySelectorAll('.carousel').forEach(function(car){
+    var track=car.querySelector('.track');
     if(!track) return;
-    var prev=document.querySelector('.cbtn.prev'), next=document.querySelector('.cbtn.next');
+    var prev=car.querySelector('.cbtn.prev'), next=car.querySelector('.cbtn.next');
     function stepW(){ var c=track.querySelector('.card'); var g=parseFloat(getComputedStyle(track).gap)||0;
       return c ? c.getBoundingClientRect().width+g : track.clientWidth*0.8; }
-    window.slideGames=function(d){ track.scrollBy({left:d*stepW(), behavior:'smooth'}); };
+    function slide(d){ track.scrollBy({left:d*stepW(), behavior:'smooth'}); }
+    if(prev) prev.addEventListener('click', function(){ slide(-1); });
+    if(next) next.addEventListener('click', function(){ slide(1); });
     function update(){ var max=track.scrollWidth-track.clientWidth-2;
       if(prev) prev.disabled = track.scrollLeft<=2;
       if(next) next.disabled = track.scrollLeft>=max; }
     track.addEventListener('scroll', update, {passive:true});
     window.addEventListener('resize', update);
     update();
-  })();
+  });
   </script>
 
   <!-- Cloudflare Web Analytics -->
