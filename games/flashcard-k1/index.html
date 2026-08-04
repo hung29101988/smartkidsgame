@@ -156,15 +156,19 @@ function render(){
     img.onerror = ()=>{ ei++; tryImg(); };
   };
   tryImg();
-  $("prevBtn").disabled = (idx===0);
-  $("nextBtn").disabled = (idx===DECK.length-1);
+  updateNav();
   speak(d.c);   // 出圖即讀（意思 + 聲音）；翻到字唔讀
+}
+function updateNav(){
+  const flipped = card.classList.contains("flipped");
+  $("prevBtn").disabled = (idx===0 && !flipped);              // 第一張嘅圖：冇得再返
+  $("nextBtn").disabled = (idx===DECK.length-1 && flipped);   // 最後一張嘅字：冇得再前
 }
 
 /* 向右（前進）：圖 → 翻到字；字 → 下一張卡（圖）*/
 function fwd(){
   if(!card.classList.contains("flipped")){
-    card.classList.add("flipped");
+    card.classList.add("flipped"); updateNav();
   } else if(idx < DECK.length-1){
     idx++; render();
   }
@@ -172,15 +176,10 @@ function fwd(){
 /* 向左（後退）：字 → 揭返去圖（同一張）；圖 → 上一張卡 */
 function back(){
   if(card.classList.contains("flipped")){
-    card.classList.remove("flipped"); speak(DECK[idx].c);
+    card.classList.remove("flipped"); speak(DECK[idx].c); updateNav();
   } else if(idx > 0){
     idx--; render();
   }
-}
-function go(step){
-  const n = idx + step;
-  if(n<0 || n>=DECK.length) return;
-  idx = n; render();
 }
 
 /* 撳一下 = 前進（同向右）*/
@@ -198,9 +197,9 @@ card.addEventListener("pointerup", e=>{
   }
 });
 
-/* nav 掣：明確揭上／下一張卡 */
-$("prevBtn").addEventListener("click", ()=>go(-1));
-$("nextBtn").addEventListener("click", ()=>go(1));
+/* nav 掣：▶ = 前進（圖→字→下一張），◀ = 後退（字→圖→上一張），同左右撥一致 */
+$("prevBtn").addEventListener("click", ()=>back());
+$("nextBtn").addEventListener("click", ()=>fwd());
 
 /* 鍵盤：→/空白 = 前進；← = 後退 */
 window.addEventListener("keydown", e=>{
