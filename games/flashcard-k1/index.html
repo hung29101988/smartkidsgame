@@ -81,11 +81,11 @@
       <div class="face front">
         <button class="say" id="sayBtn" aria-label="讀多次">🔊</button>
         <div class="pic" id="pic"></div>
-        <div class="hint">👉 向右撥（或撳一下）睇個字</div>
+        <div class="hint">👈 向左撥（或撳一下）睇個字</div>
       </div>
       <div class="face back">
         <div class="zi" id="zi">字</div>
-        <div class="hint">👉 向右：下一張 ・ 👈 向左：睇返圖</div>
+        <div class="hint">👈 向左：下一張 ・ 👉 向右：睇返圖</div>
       </div>
     </div>
   </div>
@@ -186,14 +186,14 @@ function back(){
 card.addEventListener("click", (e)=>{ if(justSwiped) return; fwd(); });
 $("sayBtn").addEventListener("click", (e)=>{ e.stopPropagation(); speak(DECK[idx].c); });
 
-/* 撥（swipe）：向右 = 前進，向左 = 後退；上下撥忽略 */
+/* 撥（swipe）：向左 = 前進（同▶），向右 = 後退（同◀）；上下撥忽略 */
 let sx=0, sy=0, justSwiped=false;
 card.addEventListener("pointerdown", e=>{ sx=e.clientX; sy=e.clientY; });
 card.addEventListener("pointerup", e=>{
   const dx=e.clientX-sx, dy=e.clientY-sy;
   if(Math.abs(dx)>45 && Math.abs(dx)>Math.abs(dy)){
     justSwiped=true; setTimeout(()=>justSwiped=false,450);
-    if(dx>0) fwd(); else back();
+    if(dx>0) back(); else fwd();
   }
 });
 
