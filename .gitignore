@@ -8,3 +8,7 @@ games/flashcard-k1/.minimax_key
 # 字卡拼砌素材（唔上傳）
 games/flashcard-k1/img/_*
 __pycache__/
+
+# 任何 flashcard 資料夾嘅 key / 素材 / pycache
+.minimax_key
+**/img/_*

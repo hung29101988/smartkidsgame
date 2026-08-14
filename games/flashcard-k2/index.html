@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>K2 中文字卡 ・ smartkidsgame</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/favicon.svg">
+<link rel="canonical" href="https://smartkidsgame.com/games/flashcard-k2/">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-user-select:none; user-select:none;
+      -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
+  html,body { height:100%; overflow:hidden; }
+  body { font-family:"PingFang HK","PingFang TC","Heiti TC","Microsoft JhengHei",sans-serif;
+    background:linear-gradient(#aee7ff 0%,#d8f4ff 42%,#c7eea0 42%,#9fd96f 100%);
+    display:flex; flex-direction:column; height:100dvh; }
+
+  /* 頂 bar */
+  header { flex:0 0 auto; display:flex; align-items:center; gap:2vmin; padding:2.4vmin 3vmin 0; z-index:5; }
+  #homeBtn { width:9vmin; height:9vmin; max-width:54px; max-height:54px; border-radius:50%;
+    background:#fffef0; border:.6vmin solid #5b7a2e; display:flex; align-items:center; justify-content:center;
+    font-size:4.6vmin; line-height:1; text-decoration:none; box-shadow:0 .7vmin 0 rgba(0,0,0,.18); flex:none; }
+  #homeBtn:active { transform:translateY(.3vmin); }
+  .title { font-family:'Baloo 2',"PingFang HK",sans-serif; font-weight:800; color:#4a6a1e;
+    font-size:clamp(18px,5vmin,26px); }
+  .counter { margin-left:auto; font-weight:800; color:#5b7a2e; font-size:clamp(15px,4vmin,20px);
+    background:rgba(255,255,255,.7); padding:.3em .7em; border-radius:50vmax; }
+
+  /* 卡台 */
+  .stage { flex:1; display:flex; align-items:center; justify-content:center; perspective:1400px; padding:2vmin; }
+  .card { width:min(84vw,64vh); max-width:460px; aspect-ratio:3/4; position:relative; cursor:pointer; }
+  .inner { position:absolute; inset:0; transform-style:preserve-3d;
+    transition:transform .55s cubic-bezier(.34,.1,.2,1); }
+  .card.flipped .inner { transform:rotateY(180deg); }
+  .face { position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    border-radius:7vmin; background:#fff; border:1vmin solid #fff; overflow:hidden;
+    box-shadow:0 2vmin 0 rgba(0,0,0,.14), 0 3vmin 4vmin rgba(0,0,0,.12);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .front .pic { flex:1; width:100%; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .front .pic img { width:100%; height:100%; object-fit:cover; }
+  .front .emoji { font-size:min(38vmin,240px); line-height:1; }
+  .hint { flex:0 0 auto; padding:2.2vmin; font-weight:800; color:#8aa564;
+    font-size:clamp(14px,3.6vmin,18px); }
+  .back { transform:rotateY(180deg); background:#fff7e6; }
+  .back .zi { font-family:"PingFang HK","PingFang TC","Heiti TC",serif; font-weight:900; color:#c0392b;
+    font-size:min(52vmin,340px); line-height:1; }
+  .say { position:absolute; top:3vmin; right:3vmin; width:12vmin; height:12vmin; max-width:64px; max-height:64px;
+    border:none; border-radius:50%; background:#8bd47a; color:#fff; font-size:6vmin; line-height:1;
+    box-shadow:0 .8vmin 0 #5ca046; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:3; }
+  .say:active { transform:translateY(.4vmin); }
+  .back .hint { color:#d6a24a; }
+
+  /* 底 nav */
+  .nav { flex:0 0 auto; display:flex; align-items:center; justify-content:center; gap:6vmin;
+    padding:2vmin 3vmin 5vmin; z-index:5; }
+  .navBtn { width:16vmin; height:16vmin; max-width:82px; max-height:82px; border:none; border-radius:50%;
+    background:#fffef0; color:#4a6a1e; font-size:8vmin; line-height:1; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 1vmin 0 rgba(0,0,0,.18); flex:none; }
+  .navBtn:active { transform:translateY(.5vmin); box-shadow:0 .5vmin 0 rgba(0,0,0,.18); }
+  .navBtn[disabled] { opacity:.35; }
+  .navBtn span { display:block; margin-top:-1vmin; }
+
+  .flash { position:fixed; inset:0; pointer-events:none; }
+</style>
+</head>
+<body>
+
+<header>
+  <a id="homeBtn" href="../../" aria-label="返回主頁">🏠</a>
+  <div class="title">K2 中文字卡</div>
+  <div class="counter" id="counter">1 / 34</div>
+</header>
+
+<div class="stage">
+  <div class="card" id="card">
+    <div class="inner">
+      <div class="face front">
+        <button class="say" id="sayBtn" aria-label="讀多次">🔊</button>
+        <div class="pic" id="pic"></div>
+        <div class="hint">👈 向左撥（或撳一下）睇個字</div>
+      </div>
+      <div class="face back">
+        <div class="zi" id="zi">字</div>
+        <div class="hint">👈 向左：下一張 ・ 👉 向右：睇返圖</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="nav">
+  <button class="navBtn" id="prevBtn" aria-label="上一張"><span>‹</span></button>
+  <button class="navBtn" id="nextBtn" aria-label="下一張"><span>›</span></button>
+</div>
+
+<script>
+/* ===== K2 中文字卡字庫 ===== */
+const DECK = [
+  {c:"坐",e:"🪑"},{c:"走",e:"🚶"},{c:"跑",e:"🏃"},{c:"跳",e:"🤸"},{c:"吃",e:"😋"},
+  {c:"喝",e:"🥤"},{c:"看",e:"👀"},{c:"聽",e:"👂"},{c:"穿",e:"👕"},{c:"用",e:"🥄"},
+  {c:"有",e:"🎁"},{c:"會",e:"👍"},{c:"愛",e:"❤️"},{c:"玩",e:"🧸"},{c:"唱",e:"🎤"},
+  {c:"狗",e:"🐕"},{c:"貓",e:"🐈"},{c:"魚",e:"🐟"},{c:"鳥",e:"🐦"},{c:"牛",e:"🐄"},{c:"羊",e:"🐑"},{c:"馬",e:"🐴"},
+  {c:"飯",e:"🍚"},{c:"麵",e:"🍜"},{c:"蛋",e:"🥚"},{c:"肉",e:"🍖"},{c:"菜",e:"🥬"},{c:"瓜",e:"🍉"},
+  {c:"車",e:"🚗"},{c:"書",e:"📖"},{c:"球",e:"⚽"},{c:"門",e:"🚪"},{c:"家",e:"🏠"},{c:"田",e:"🌾"}
+];
+const pad = n => String(n+1).padStart(2,"0");
+
+const $ = id => document.getElementById(id);
+const card = $("card"), pic = $("pic"), zi = $("zi"), counter = $("counter");
+let idx = 0, renderToken = 0;
+
+/* 廣東話讀音 */
+let voice = null;
+function pickVoice(){
+  const vs = speechSynthesis.getVoices();
+  voice = vs.find(v=>/zh-HK|yue|zh_HK/i.test(v.lang)) || vs.find(v=>/zh-TW|zh-Hant/i.test(v.lang)) || vs.find(v=>/^zh/i.test(v.lang)) || null;
+}
+if("speechSynthesis" in window){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function speak(t){
+  if(!("speechSynthesis" in window)) return;
+  try{ speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(t); u.lang="zh-HK"; u.rate=.75; if(voice) u.voice=voice;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+/* 載入一張卡（圖用 img/NN.png，冇就用 emoji）*/
+function render(){
+  const d = DECK[idx];
+  // 即時 snap 返正面（唔做翻轉動畫），避免閃到下一張嘅字面
+  const inner = card.querySelector(".inner");
+  inner.style.transition = "none";
+  card.classList.remove("flipped");
+  void inner.offsetWidth;        // 強制 reflow 鎖定正面
+  inner.style.transition = "";   // 還原動畫，之後撥先至翻轉
+  zi.textContent = d.c;
+  counter.textContent = (idx+1) + " / " + DECK.length;
+  // 圖：試 img/NN.png，load 唔到 fallback emoji
+  // 圖：cache 到就即刻換（零閃）；未 cache 先保留住舊圖，載完先換；全部冇先用 emoji
+  const myTok = ++renderToken;
+  const num = pad(idx);
+  const exts = ["jpg","png","webp","jpeg"];
+  let ei = 0;
+  const show = el => { if(myTok===renderToken){ pic.innerHTML=""; pic.appendChild(el); } };
+  const tryImg = ()=>{
+    if(myTok!==renderToken) return;
+    if(ei>=exts.length){ const e=document.createElement("div"); e.className="emoji"; e.textContent=d.e; show(e); return; }
+    const img = new Image(); img.alt = d.c;
+    img.src = "img/" + num + "." + exts[ei];
+    if(img.complete && img.naturalWidth){ show(img); return; }   // 已 cache → 即刻，無閃
+    img.onload = ()=>show(img);
+    img.onerror = ()=>{ ei++; tryImg(); };
+  };
+  tryImg();
+  updateNav();
+  speak(d.c);   // 出圖即讀（意思 + 聲音）；翻到字唔讀
+}
+function updateNav(){
+  const flipped = card.classList.contains("flipped");
+  $("prevBtn").disabled = (idx===0 && !flipped);              // 第一張嘅圖：冇得再返
+  $("nextBtn").disabled = (idx===DECK.length-1 && flipped);   // 最後一張嘅字：冇得再前
+}
+
+/* 向右（前進）：圖 → 翻到字；字 → 下一張卡（圖）*/
+function fwd(){
+  if(!card.classList.contains("flipped")){
+    card.classList.add("flipped"); updateNav();
+  } else if(idx < DECK.length-1){
+    idx++; render();
+  }
+}
+/* 向左（後退）：字 → 揭返去圖（同一張）；圖 → 上一張卡 */
+function back(){
+  if(card.classList.contains("flipped")){
+    card.classList.remove("flipped"); speak(DECK[idx].c); updateNav();
+  } else if(idx > 0){
+    idx--; render();
+  }
+}
+
+/* 撳一下 = 前進（同向右）*/
+card.addEventListener("click", (e)=>{ if(justSwiped) return; fwd(); });
+$("sayBtn").addEventListener("click", (e)=>{ e.stopPropagation(); speak(DECK[idx].c); });
+
+/* 撥（swipe）：向左 = 前進（同▶），向右 = 後退（同◀）；上下撥忽略 */
+let sx=0, sy=0, justSwiped=false;
+card.addEventListener("pointerdown", e=>{ sx=e.clientX; sy=e.clientY; });
+card.addEventListener("pointerup", e=>{
+  const dx=e.clientX-sx, dy=e.clientY-sy;
+  if(Math.abs(dx)>45 && Math.abs(dx)>Math.abs(dy)){
+    justSwiped=true; setTimeout(()=>justSwiped=false,450);
+    if(dx>0) back(); else fwd();
+  }
+});
+
+/* nav 掣：▶ = 前進（圖→字→下一張），◀ = 後退（字→圖→上一張），同左右撥一致 */
+$("prevBtn").addEventListener("click", ()=>back());
+$("nextBtn").addEventListener("click", ()=>fwd());
+
+/* 鍵盤：→/空白 = 前進；← = 後退 */
+window.addEventListener("keydown", e=>{
+  if(e.key==="ArrowLeft"){ e.preventDefault(); back(); }
+  else if(e.key==="ArrowRight"||e.key===" "||e.key==="ArrowDown"){ e.preventDefault(); fwd(); }
+});
+
+// 開場預載全部圖，令揭卡即時、無閃
+DECK.forEach((_,i)=>{ const im=new Image(); im.src="img/"+pad(i)+".jpg"; });
+
+render();
+</script>
+<!-- Cloudflare Web Analytics -->
+<script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "f28d4375be774f74a246a442967a04f9"}'></script>
+</body>
+</html>
