@@ -49,9 +49,9 @@ CARDS = [
     ("p2", "scene", "a tiny green sprout with two small leaves growing out of brown soil"),
     ("p3", "scene", "a young small green leafy plant with several leaves growing in soil, not yet flowering"),
     ("p4", "scene", "one beautiful blooming flower with colourful petals on a green stem in soil"),
-    # ---- 成長階段（由細到大）----
-    ("g1", "scene", "a cute East Asian newborn baby lying down wrapped in a soft blanket, close up"),
-    ("g2", "scene", "an East Asian Chinese young child about five years old standing and smiling, full body, plain background"),
+    # ---- 成長階段（由細到大，統一女性）----
+    ("g1", "scene", "a cute East Asian newborn baby girl lying down wrapped in a soft pink blanket, close up, clearly a baby girl"),
+    ("g2", "scene", "a realistic photo of a happy East Asian Chinese little girl about five years old with ponytails, standing and smiling, full body portrait, plain light background"),
     ("g3", "scene", "a grown-up adult East Asian Chinese woman in her thirties, clearly a fully grown tall adult with adult body proportions, standing and smiling, full body, wearing casual clothes, plain background, NOT a child"),
     ("g4", "scene", "a happy East Asian Chinese elderly grandparent with grey hair smiling, upper body, plain background"),
     # ---- 蝴蝶生命週期 ----
@@ -59,11 +59,11 @@ CARDS = [
     ("b2", "scene", "a green caterpillar crawling on a green leaf, macro close up"),
     ("b3", "scene", "a green butterfly chrysalis cocoon hanging from a small twig, macro close up"),
     ("b4", "scene", "a beautiful colourful butterfly with fully open wings resting on a flower"),
-    # ---- 洗手步驟 ----
-    ("w1", "scene", "a young child's two hands being wet under a running water tap at a sink, close up"),
-    ("w2", "scene", "a young child's two hands covered with white soap bubbles and foam, washing, close up"),
-    ("w3", "scene", "a young child rubbing and scrubbing two soapy foamy hands together, close up"),
-    ("w4", "scene", "a young child drying both hands with a clean towel, close up"),
+    # ---- 洗手因果：玩污手 → 洗手 → 抹乾 → 食嘢 ----
+    ("w1", "scene", "an East Asian Chinese young child playing outdoors on the ground, hands are dirty and muddy, showing dirty messy hands, close up"),
+    ("w2", "scene", "an East Asian Chinese young child washing both hands with soap under a running water tap at a sink"),
+    ("w3", "scene", "an East Asian Chinese young child drying both clean hands with a clean towel"),
+    ("w4", "scene", "an East Asian Chinese young child happily eating food with clean hands at a table"),
     # ---- 一日天色（由朝到晚）----
     ("d1", "scene", "early morning daytime sky, a soft pale light blue sky with a small low morning sun near the horizon, fresh bright gentle morning light, calm scenery, mostly blue not orange, no people"),
     ("d2", "scene", "a bright blue clear midday sky with a shining sun over a green landscape, no people"),
