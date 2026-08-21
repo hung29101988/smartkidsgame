@@ -65,7 +65,7 @@ CARDS = [
     ("w3", "scene", "a young child rubbing and scrubbing two soapy foamy hands together, close up"),
     ("w4", "scene", "a young child drying both hands with a clean towel, close up"),
     # ---- 一日天色（由朝到晚）----
-    ("d1", "scene", "a beautiful sunrise over the horizon, early morning sky with soft orange glow, scenery, no people"),
+    ("d1", "scene", "early morning daytime sky, a soft pale light blue sky with a small low morning sun near the horizon, fresh bright gentle morning light, calm scenery, mostly blue not orange, no people"),
     ("d2", "scene", "a bright blue clear midday sky with a shining sun over a green landscape, no people"),
     ("d3", "scene", "a beautiful sunset with orange pink and purple sky over the horizon, scenery, no people"),
     ("d4", "scene", "a calm night sky with a bright full moon and twinkling stars, dark blue evening, no people"),
