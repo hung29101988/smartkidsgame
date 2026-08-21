@@ -176,17 +176,23 @@ const LEVELS = [
   {type:"size",   dir:"asc",  obj:"ball",  n:3, prompt:"由細到大排！"},
   {type:"count",  dir:"asc",  obj:"duck",  n:3, prompt:"由少到多排！"},
   {type:"height", dir:"asc",  obj:"tree",  n:3, prompt:"由矮到高排！"},
+  {type:"emoji",  prompt:"由朝到晚，邊件事先做？", items:["🌅","🪥","🍳","🎒"], imgs:["m1","m2","m3","m4"], say:["起身","刷牙","食早餐","返學"]},
   {type:"size",   dir:"asc",  obj:"apple", n:4, prompt:"由細到大排！"},
   {type:"count",  dir:"asc",  obj:"strawberry", n:4, prompt:"由少到多排！"},
-  {type:"emoji",  prompt:"由朝到晚，邊件事先做？", items:["🌅","🪥","🍳","🎒"], imgs:["m1","m2","m3","m4"], say:["起身","刷牙","食早餐","返學"]},
+  {type:"emoji",  prompt:"由細到大，人係點樣長大？", items:["👶","🧒","🧑","🧓"], imgs:["g1","g2","g3","g4"], say:["嬰兒","小朋友","大人","老人家"]},
   {type:"size",   dir:"desc", obj:"star",  n:4, prompt:"由大到細排！"},
-  {type:"emoji",  prompt:"種子點樣變花？", items:["🌰","🌱","🌿","🌸"], imgs:["p1","p2","p3","p4"], say:["種子","發芽","長大","開花"]},
+  {type:"emoji",  prompt:"洗手應該點做？", items:["💧","🧼","🙌","🧻"], imgs:["w1","w2","w3","w4"], say:["先整濕手","再搽番梘","搓乾淨手","最後抹乾"]},
   {type:"height", dir:"desc", obj:"tree",  n:4, prompt:"由高到矮排！"},
+  {type:"emoji",  prompt:"毛毛蟲點樣變蝴蝶？", items:["🥚","🐛","🛡️","🦋"], imgs:["b1","b2","b3","b4"], say:["蟲蛋","毛毛蟲","結蛹","蝴蝶"]},
   {type:"count",  dir:"asc",  obj:"apple", n:5, prompt:"由少到多排！"},
+  {type:"emoji",  prompt:"由朝到晚，天色點樣變？", items:["🌅","☀️","🌇","🌙"], imgs:["d1","d2","d3","d4"], say:["日出","中午","黃昏","夜晚"]},
+  {type:"emoji",  prompt:"種子點樣變花？", items:["🌰","🌱","🌿","🌸"], imgs:["p1","p2","p3","p4"], say:["種子","發芽","長大","開花"]},
 ];
 
 /* ===== MiniMax 圖預載（未有圖時 fallback 返 SVG）===== */
-const IMG_KEYS = ["ball","apple","star","duck","strawberry","tree","m1","m2","m3","m4","p1","p2","p3","p4"];
+const IMG_KEYS = ["ball","apple","star","duck","strawberry","tree",
+  "m1","m2","m3","m4","p1","p2","p3","p4",
+  "g1","g2","g3","g4","b1","b2","b3","b4","w1","w2","w3","w4","d1","d2","d3","d4"];
 const IMGREADY = {};
 function preloadImgs(cb){
   let left = IMG_KEYS.length; if(!left){ cb&&cb(); return; }

@@ -49,6 +49,26 @@ CARDS = [
     ("p2", "scene", "a tiny green sprout with two small leaves growing out of brown soil"),
     ("p3", "scene", "a young small green leafy plant with several leaves growing in soil, not yet flowering"),
     ("p4", "scene", "one beautiful blooming flower with colourful petals on a green stem in soil"),
+    # ---- 成長階段（由細到大）----
+    ("g1", "scene", "a cute East Asian newborn baby lying down wrapped in a soft blanket, close up"),
+    ("g2", "scene", "an East Asian Chinese young child about five years old standing and smiling, full body, plain background"),
+    ("g3", "scene", "a grown-up adult East Asian Chinese woman in her thirties, clearly a fully grown tall adult with adult body proportions, standing and smiling, full body, wearing casual clothes, plain background, NOT a child"),
+    ("g4", "scene", "a happy East Asian Chinese elderly grandparent with grey hair smiling, upper body, plain background"),
+    # ---- 蝴蝶生命週期 ----
+    ("b1", "scene", "a small cluster of tiny round butterfly eggs on a green leaf, macro close up"),
+    ("b2", "scene", "a green caterpillar crawling on a green leaf, macro close up"),
+    ("b3", "scene", "a green butterfly chrysalis cocoon hanging from a small twig, macro close up"),
+    ("b4", "scene", "a beautiful colourful butterfly with fully open wings resting on a flower"),
+    # ---- 洗手步驟 ----
+    ("w1", "scene", "a young child's two hands being wet under a running water tap at a sink, close up"),
+    ("w2", "scene", "a young child's two hands covered with white soap bubbles and foam, washing, close up"),
+    ("w3", "scene", "a young child rubbing and scrubbing two soapy foamy hands together, close up"),
+    ("w4", "scene", "a young child drying both hands with a clean towel, close up"),
+    # ---- 一日天色（由朝到晚）----
+    ("d1", "scene", "a beautiful sunrise over the horizon, early morning sky with soft orange glow, scenery, no people"),
+    ("d2", "scene", "a bright blue clear midday sky with a shining sun over a green landscape, no people"),
+    ("d3", "scene", "a beautiful sunset with orange pink and purple sky over the horizon, scenery, no people"),
+    ("d4", "scene", "a calm night sky with a bright full moon and twinkling stars, dark blue evening, no people"),
 ]
 
 def load_key():
