@@ -57,11 +57,12 @@
     background:rgba(90,120,60,.55); border-radius:50vmax; padding:.5vmin 2.2vmin; }
 
   /* 火車區 */
-  #trainArea { flex:1; display:flex; flex-direction:column; justify-content:center; overflow:hidden; position:relative; }
-  #train { display:flex; align-items:flex-end; gap:1vmin; padding:0 4vmin; justify-content:center; will-change:transform; }
+  #trainArea { flex:1; display:flex; flex-direction:column; justify-content:flex-end;
+    padding-bottom:1vmin; overflow:hidden; position:relative; }
+  #train { display:flex; align-items:flex-end; gap:1vmin; padding:0 3vmin; justify-content:center; will-change:transform; z-index:2; }
   .loco { width:26vmin; max-width:170px; flex:none; }
   .loco svg { width:100%; height:auto; display:block; }
-  .carriage { flex:none; width:19vmin; max-width:120px; }
+  .carriage { flex:none; width:var(--cw,19vmin); }
   .cbody { aspect-ratio:1/1; border-radius:2.4vmin; background:#fff; border:.7vmin dashed #b7c8d6;
     display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative; }
   .carriage.filled .cbody { border-style:solid; border-color:#fff; box-shadow:0 1vmin 0 rgba(0,0,0,.12); cursor:pointer; }
@@ -72,22 +73,37 @@
     color:#c9d4e0; font-size:3.4vmin; }
   .carriage.filled .cnum { color:#8bb0d8; }
 
-  /* 軌道 */
-  #track { height:3vmin; margin:1vmin 0 0; background:
-      linear-gradient(#8a6a4a,#6a4a2a) center/100% .9vmin no-repeat,
-      repeating-linear-gradient(90deg, #a98a6a 0 1.4vmin, transparent 1.4vmin 6vmin) center/100% 100% no-repeat;
-    border-top:.4vmin solid #b0b0b0; }
+  /* ===== 石拱橋（viaduct）===== */
+  #bridge { width:100%; position:relative; z-index:1; margin-top:-.5vmin; }
+  #deck { position:relative; height:3.2vmin; background:linear-gradient(#d9c39a,#b6a06e);
+    border-top:.5vmin solid #efe0bd; box-shadow:0 .5vmin 0 rgba(0,0,0,.14); }
+  #deck::before { content:""; position:absolute; left:0; right:0; top:-1.15vmin; height:1.15vmin;
+    background:
+      linear-gradient(#5b4a2e,#5b4a2e) 0 .12vmin/100% .34vmin no-repeat,
+      linear-gradient(#5b4a2e,#5b4a2e) 0 .7vmin/100% .34vmin no-repeat,
+      repeating-linear-gradient(90deg,#7a5a34 0 .55vmin, transparent .55vmin 3vmin); }
+  #arches { height:11vmin; background-repeat:repeat-x; background-position:center top; background-size:auto 100%; }
 
   /* 月台（卡池）*/
   #yard { flex:0 0 auto; min-height:26vmin; display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
     gap:2.4vmin; padding:2.6vmin 4vmin calc(4vmin + env(safe-area-inset-bottom));
     background:rgba(255,255,255,.35); border-top:.5vmin solid rgba(255,255,255,.6); }
-  .card { width:19vmin; max-width:120px; aspect-ratio:1/1; border-radius:2.4vmin; background:#fff;
+  .card { width:var(--cw,19vmin); aspect-ratio:1/1; border-radius:2.4vmin; background:#fff;
     border:.7vmin solid #fff; box-shadow:0 1vmin 0 rgba(0,0,0,.14); cursor:pointer;
-    display:flex; align-items:center; justify-content:center; overflow:hidden; }
+    display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative; }
   .card:active { transform:translateY(.6vmin) scale(.97); }
   .card svg, .cbody svg { width:86%; height:86%; }
   .emoji { font-size:min(11vmin,70px); line-height:1; }
+
+  /* 卡內 MiniMax 圖 */
+  .obj { display:block; margin:auto; object-fit:contain; mix-blend-mode:multiply; }
+  .obj.tall { align-self:flex-end; width:auto; margin:0 auto; }
+  .scene { width:100%; height:100%; object-fit:cover; border-radius:1.7vmin; }
+  .counts { width:94%; height:94%; display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:5%; }
+  .counts .obj { mix-blend-mode:multiply; }
+  .counts.c1 .obj { width:58% } .counts.c2 .obj { width:40% } .counts.c3 .obj { width:38% }
+  .counts.c4 .obj { width:38% } .counts.c5 .obj { width:29% }
+
   .pop { animation:pop .28s ease; }
   @keyframes pop { 0%{transform:scale(.6)} 60%{transform:scale(1.12)} 100%{transform:scale(1)} }
   .shake { animation:shake .4s ease; }
@@ -131,7 +147,7 @@
   </div>
   <div id="trainArea">
     <div id="train"></div>
-    <div id="track"></div>
+    <div id="bridge"><div id="deck"></div><div id="arches"></div></div>
   </div>
   <div id="yard"></div>
 </div>
@@ -155,18 +171,30 @@ const $ = id => document.getElementById(id);
 
 /* ===== 關卡 ===== */
 // type: size / count / height / emoji ；dir: asc/desc（emoji 用固定次序）
+// obj = MiniMax 圖 key（img/<key>.jpg）；emoji 用 imgs[] 逐格情境圖
 const LEVELS = [
   {type:"size",   dir:"asc",  obj:"ball",  n:3, prompt:"由細到大排！"},
-  {type:"count",  dir:"asc",  n:3,         prompt:"由少到多排！"},
-  {type:"height", dir:"asc",  n:3,         prompt:"由矮到高排！"},
+  {type:"count",  dir:"asc",  obj:"duck",  n:3, prompt:"由少到多排！"},
+  {type:"height", dir:"asc",  obj:"tree",  n:3, prompt:"由矮到高排！"},
   {type:"size",   dir:"asc",  obj:"apple", n:4, prompt:"由細到大排！"},
-  {type:"count",  dir:"asc",  n:4,         prompt:"由少到多排！"},
-  {type:"emoji",  prompt:"由朝到晚，邊件事先做？", items:["🌅","🪥","🍳","🎒"], say:["起身","刷牙","食早餐","返學"]},
+  {type:"count",  dir:"asc",  obj:"strawberry", n:4, prompt:"由少到多排！"},
+  {type:"emoji",  prompt:"由朝到晚，邊件事先做？", items:["🌅","🪥","🍳","🎒"], imgs:["m1","m2","m3","m4"], say:["起身","刷牙","食早餐","返學"]},
   {type:"size",   dir:"desc", obj:"star",  n:4, prompt:"由大到細排！"},
-  {type:"emoji",  prompt:"種子點樣變花？", items:["🌰","🌱","🌿","🌸"], say:["種子","發芽","長大","開花"]},
-  {type:"height", dir:"desc", n:4,         prompt:"由高到矮排！"},
-  {type:"count",  dir:"asc",  n:5,         prompt:"由少到多排！"},
+  {type:"emoji",  prompt:"種子點樣變花？", items:["🌰","🌱","🌿","🌸"], imgs:["p1","p2","p3","p4"], say:["種子","發芽","長大","開花"]},
+  {type:"height", dir:"desc", obj:"tree",  n:4, prompt:"由高到矮排！"},
+  {type:"count",  dir:"asc",  obj:"apple", n:5, prompt:"由少到多排！"},
 ];
+
+/* ===== MiniMax 圖預載（未有圖時 fallback 返 SVG）===== */
+const IMG_KEYS = ["ball","apple","star","duck","strawberry","tree","m1","m2","m3","m4","p1","p2","p3","p4"];
+const IMGREADY = {};
+function preloadImgs(cb){
+  let left = IMG_KEYS.length; if(!left){ cb&&cb(); return; }
+  IMG_KEYS.forEach(k=>{ const im=new Image();
+    im.onload =()=>{ IMGREADY[k]=true; if(--left===0) cb&&cb(); };
+    im.onerror=()=>{ if(--left===0) cb&&cb(); };
+    im.src="img/"+k+".jpg"; });
+}
 
 let _gid = 0;
 function locoSVG(){
@@ -195,27 +223,50 @@ function locoSVG(){
   </svg>`;
 }
 
-// 卡內容
-const COLORS = ["#ff6b6b","#4cb0e0","#f5a623","#8bd47a","#a97fd8"];
-function contentSVG(level, item){
+/* ===== 卡內容：優先用 MiniMax 圖，未有就用 SVG ===== */
+function cardContent(level, item){
+  if(level.type==="emoji"){
+    if(item.img && IMGREADY[item.img]) return `<img class="scene" src="img/${item.img}.jpg" alt="">`;
+    return `<div class="emoji">${item.emoji}</div>`;
+  }
   if(level.type==="size"){
-    const r = 14 + item.size*11;   // size 1..n
-    const col = "#ff6b6b";
-    if(level.obj==="apple") return `<svg viewBox="0 0 100 100"><path d="M50 ${50-r} C${50-r*.9} ${50-r} ${50-r} ${50+r*.5} ${50-r*.55} ${50+r*.8} C${50-r*.2} ${50+r} ${50+r*.2} ${50+r} ${50+r*.55} ${50+r*.8} C${50+r} ${50+r*.5} ${50+r*.9} ${50-r} 50 ${50-r} Z" fill="#e23b3b"/><rect x="48" y="${50-r-6}" width="4" height="8" rx="2" fill="#7a5230"/><ellipse cx="${57}" cy="${50-r-2}" rx="7" ry="4" fill="#6cc24a"/></svg>`;
-    if(level.obj==="star"){ const R=r, pts=star(50,52,R,R*0.45,5); return `<svg viewBox="0 0 100 100"><polygon points="${pts}" fill="#ffcf3a" stroke="#e8a11a" stroke-width="2"/></svg>`; }
-    return `<svg viewBox="0 0 100 100"><circle cx="50" cy="52" r="${r}" fill="${col}"/><ellipse cx="${50-r*.35}" cy="${52-r*.4}" rx="${r*.28}" ry="${r*.18}" fill="rgba(255,255,255,.6)"/></svg>`;
+    if(IMGREADY[level.obj]){
+      const pct = Math.round(30 + item.size*(50/level.n));
+      return `<img class="obj" src="img/${level.obj}.jpg" style="width:${pct}%" alt="">`;
+    }
+    return sizeSVG(level, item);
   }
   if(level.type==="height"){
-    const h = 22 + item.h*16;   // tree height
-    return `<svg viewBox="0 0 100 100"><rect x="46" y="${88-h*.28}" width="8" height="${h*.28}" fill="#8a5a30"/><polygon points="50,${88-h} 30,${88-h*.35} 70,${88-h*.35}" fill="#4f9a44"/><polygon points="50,${88-h*.7} 34,${88-h*.28} 66,${88-h*.28}" fill="#5faa50"/></svg>`;
+    if(IMGREADY[level.obj]){
+      const pct = Math.round(36 + item.h*(54/level.n));
+      return `<img class="obj tall" src="img/${level.obj}.jpg" style="height:${pct}%" alt="">`;
+    }
+    return heightSVG(item);
   }
   if(level.type==="count"){
-    let dots="", n=item.n; const positions=dotPos(n);
-    positions.forEach(p=>{ dots+=`<circle cx="${p[0]}" cy="${p[1]}" r="9" fill="#4cb0e0" stroke="#2f8fc4" stroke-width="2"/>`; });
-    return `<svg viewBox="0 0 100 100">${dots}</svg>`;
+    if(IMGREADY[level.obj]){
+      let s=""; for(let i=0;i<item.n;i++) s+=`<img class="obj" src="img/${level.obj}.jpg" alt="">`;
+      return `<div class="counts c${item.n}">${s}</div>`;
+    }
+    return countSVG(item);
   }
-  if(level.type==="emoji"){ return `<div class="emoji">${item.emoji}</div>`; }
   return "";
+}
+
+/* ===== SVG fallback ===== */
+function sizeSVG(level, item){
+  const r = 14 + item.size*11;
+  if(level.obj==="apple") return `<svg viewBox="0 0 100 100"><path d="M50 ${50-r} C${50-r*.9} ${50-r} ${50-r} ${50+r*.5} ${50-r*.55} ${50+r*.8} C${50-r*.2} ${50+r} ${50+r*.2} ${50+r} ${50+r*.55} ${50+r*.8} C${50+r} ${50+r*.5} ${50+r*.9} ${50-r} 50 ${50-r} Z" fill="#e23b3b"/><rect x="48" y="${50-r-6}" width="4" height="8" rx="2" fill="#7a5230"/><ellipse cx="57" cy="${50-r-2}" rx="7" ry="4" fill="#6cc24a"/></svg>`;
+  if(level.obj==="star"){ const pts=star(50,52,r,r*0.45,5); return `<svg viewBox="0 0 100 100"><polygon points="${pts}" fill="#ffcf3a" stroke="#e8a11a" stroke-width="2"/></svg>`; }
+  return `<svg viewBox="0 0 100 100"><circle cx="50" cy="52" r="${r}" fill="#ff6b6b"/><ellipse cx="${50-r*.35}" cy="${52-r*.4}" rx="${r*.28}" ry="${r*.18}" fill="rgba(255,255,255,.6)"/></svg>`;
+}
+function heightSVG(item){
+  const h = 22 + item.h*16;
+  return `<svg viewBox="0 0 100 100"><rect x="46" y="${88-h*.28}" width="8" height="${h*.28}" fill="#8a5a30"/><polygon points="50,${88-h} 30,${88-h*.35} 70,${88-h*.35}" fill="#4f9a44"/><polygon points="50,${88-h*.7} 34,${88-h*.28} 66,${88-h*.28}" fill="#5faa50"/></svg>`;
+}
+function countSVG(item){
+  let dots=""; dotPos(item.n).forEach(p=>{ dots+=`<circle cx="${p[0]}" cy="${p[1]}" r="9" fill="#4cb0e0" stroke="#2f8fc4" stroke-width="2"/>`; });
+  return `<svg viewBox="0 0 100 100">${dots}</svg>`;
 }
 function star(cx,cy,R,r,n){ let p=[]; for(let i=0;i<n*2;i++){ const rad=(i%2?r:R), a=Math.PI*i/n - Math.PI/2; p.push((cx+rad*Math.cos(a)).toFixed(1)+","+(cy+rad*Math.sin(a)).toFixed(1)); } return p.join(" "); }
 function dotPos(n){ const m={1:[[50,50]],2:[[35,50],[65,50]],3:[[50,32],[35,62],[65,62]],4:[[36,36],[64,36],[36,64],[64,64]],5:[[36,36],[64,36],[50,50],[36,64],[64,64]]}; return m[n]||m[5]; }
@@ -225,7 +276,7 @@ function buildItems(level){
   const n = level.type==="emoji" ? level.items.length : level.n;
   let items=[];
   if(level.type==="emoji"){
-    items = level.items.map((e,i)=>({emoji:e, say:level.say[i], rank:i}));
+    items = level.items.map((e,i)=>({emoji:e, img:level.imgs?level.imgs[i]:null, say:level.say[i], rank:i}));
   } else if(level.type==="size"){
     for(let s=1;s<=n;s++) items.push({size:s, rank: level.dir==="asc"? s-1 : n-s, say:null});
   } else if(level.type==="height"){
@@ -239,12 +290,25 @@ function buildItems(level){
   return items;
 }
 
+/* ===== 車卡尺寸：撐到最大又要成條火車入到畫面 ===== */
+function computeCW(n){
+  const vw=innerWidth, vmin=Math.min(innerWidth,innerHeight);
+  const loco=Math.min(vmin*0.26,170);
+  const gap=vmin*0.01, pad=vmin*0.03*2;
+  const avail = vw - loco - pad - gap*(n+1) - vmin*0.02;
+  let cw = avail/n;
+  cw = Math.min(cw, vmin*0.30, 200);
+  cw = Math.max(cw, 56);
+  document.documentElement.style.setProperty('--cw', cw+'px');
+}
+
 /* ===== 遊戲狀態 ===== */
 let lvl=0, items=[], slots=[], busy=false;
 
 function render(){
   const level=LEVELS[lvl];
   const n = level.type==="emoji" ? level.items.length : level.n;
+  computeCW(n);
   $("gameScreen").className = "screen show sc"+(Math.floor(lvl/3)%4);
   $("station").textContent = "第 "+(lvl+1)+" 站";
   $("promptText").textContent = level.prompt;
@@ -253,7 +317,7 @@ function render(){
   for(let i=0;i<n;i++){
     const cid = slots[i];
     const filled = cid!=null;
-    const inner = filled ? contentSVG(level, items.find(x=>x.id===cid)) : "";
+    const inner = filled ? cardContent(level, items.find(x=>x.id===cid)) : "";
     t += `<div class="carriage ${filled?'filled':''}" data-slot="${i}">
             <div class="cbody">${filled?inner:`<span class="cnum">${i+1}</span>`}</div>
             <div class="wheels"><i></i><i></i></div>
@@ -264,7 +328,7 @@ function render(){
   // 月台：未擺入嘅卡
   const placed = new Set(slots.filter(x=>x!=null));
   $("yard").innerHTML = items.filter(x=>!placed.has(x.id))
-    .map(x=>`<div class="card" data-id="${x.id}">${contentSVG(level,x)}</div>`).join("");
+    .map(x=>`<div class="card" data-id="${x.id}">${cardContent(level,x)}</div>`).join("");
   bind();
 }
 
@@ -290,7 +354,6 @@ function placeCard(id){
 function removeSlot(s){ slots[s]=null; sfx.click(); render(); }
 
 function check(){
-  // 正確 = 每卡 rank === 位置
   const ok = slots.every((cid,i)=> items.find(x=>x.id===cid).rank===i );
   if(ok){ depart(); }
   else {
@@ -300,22 +363,27 @@ function check(){
   }
 }
 
+/* 新火車由右邊入 */
+function enterTrain(){
+  const tr=$("train");
+  tr.style.transition="none"; tr.style.transform="translateX(120vw)";
+  requestAnimationFrame(()=>{ tr.style.transition="transform .7s ease-out"; tr.style.transform="translateX(0)"; });
+  setTimeout(()=>{ tr.style.transition=""; }, 720);
+}
+
 function depart(){
   busy=true; sfx.win(); speak("排啱喇！開車！");
   puffSmoke();
   const tr=$("train");
   tr.style.transition="transform 1.3s cubic-bezier(.4,.05,.6,1)";
-  tr.style.transform="translateX(130vw)";
+  tr.style.transform="translateX(-130vw)";   // 成功：向左駛走
   setTimeout(()=>{
-    tr.style.transition="";
     lvl++;
-    if(lvl>=LEVELS.length){ win(); busy=false; return; }
+    if(lvl>=LEVELS.length){ tr.style.transition=""; win(); busy=false; return; }
     slots = new Array(LEVELS[lvl].type==="emoji"?LEVELS[lvl].items.length:LEVELS[lvl].n).fill(null);
     items = buildItems(LEVELS[lvl]);
     render();
-    // 新火車由左入
-    tr.style.transition="none"; tr.style.transform="translateX(-130vw)";
-    requestAnimationFrame(()=>{ tr.style.transition="transform .7s ease-out"; tr.style.transform="translateX(0)"; });
+    enterTrain();                              // 新一架由右邊入
     setTimeout(()=>{ busy=false; speak(LEVELS[lvl].prompt); }, 750);
   }, 1300);
 }
@@ -336,7 +404,7 @@ function startLevel(){
   lvl=0; busy=false;
   slots = new Array(LEVELS[0].type==="emoji"?LEVELS[0].items.length:LEVELS[0].n).fill(null);
   items = buildItems(LEVELS[0]);
-  showScreen("gameScreen"); render(); speak(LEVELS[0].prompt);
+  showScreen("gameScreen"); render(); enterTrain(); speak(LEVELS[0].prompt);
 }
 function win(){ showScreen("winScreen"); sfx.win(); speak("嘩！你排好晒所有火車，好叻呀！"); }
 
@@ -357,7 +425,18 @@ const sfx = {
   win:()=>{[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,.18,"triangle",.14),i*90));},
 };
 
-/* ===== 開場人物（女仔揮手）===== */
+/* ===== 石橋拱門背景（SVG tile 平鋪）===== */
+(function(){
+  const TILE = "<svg xmlns='http://www.w3.org/2000/svg' width='120' height='110' viewBox='0 0 120 110'>"
+    + "<path d='M0 0 H120 V110 H100 V50 A40 42 0 0 0 20 50 V110 H0 Z' fill='#cdb488'/>"
+    + "<path d='M0 0 H120 V110 H100 V50 A40 42 0 0 0 20 50 V110 H0 Z' fill='none' stroke='#a88f63' stroke-width='2.5'/>"
+    + "<rect x='0' y='0' width='120' height='7' fill='#b89a68'/>"
+    + "<rect x='54' y='3' width='12' height='18' rx='2' fill='#bda06f' stroke='#a88f63' stroke-width='2'/>"
+    + "<rect x='0' y='96' width='120' height='14' fill='rgba(90,70,40,.18)'/></svg>";
+  $("arches").style.backgroundImage = "url(\"data:image/svg+xml," + encodeURIComponent(TILE) + "\")";
+})();
+
+/* ===== 開場人物 ===== */
 $("startHero").innerHTML = `<svg viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg">
   <g transform="translate(20 10)">
     ${locoSVG().replace('<svg viewBox="0 0 120 100"','<svg x="0" y="0" width="120" height="100" viewBox="0 0 120 100"')}
@@ -373,6 +452,8 @@ $("startHero").innerHTML = `<svg viewBox="0 0 200 130" xmlns="http://www.w3.org/
 $("playBtn").addEventListener("click", ()=>{ if(inRest())return; ac(); engaged=true; lastTick=Date.now(); startLevel(); });
 $("replayBtn").addEventListener("click", ()=>{ if(inRest())return; startLevel(); });
 $("sayBtn").addEventListener("click", (e)=>{ e.stopPropagation(); speak(LEVELS[lvl]?LEVELS[lvl].prompt:""); });
+addEventListener("resize", ()=>{ if($("gameScreen").classList.contains("show") && !busy) render(); });
+preloadImgs(()=>{ if($("gameScreen").classList.contains("show")) render(); });
 
 /* ===== 護眼時間限制（全平台共用）===== */
 const LIMIT_PLAY=10*60*1000, LIMIT_REST=10*60*1000, IDLE_RESET=10*60*1000;
