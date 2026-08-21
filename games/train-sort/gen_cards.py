@@ -40,10 +40,10 @@ CARDS = [
     ("strawberry", "obj", "a single fresh ripe red strawberry with small green leaves"),
     ("tree",       "obj", "a single lush round green broadleaf tree with a short brown trunk, the whole tree from base to top"),
     # ---- 朝早流程（由朝到晚）----
-    ("m1", "scene", "an East Asian Chinese young child just waking up and stretching arms in bed in the morning, bright bedroom"),
-    ("m2", "scene", "an East Asian Chinese young child brushing teeth with a toothbrush at a bathroom sink"),
-    ("m3", "scene", "an East Asian Chinese young child sitting at a table eating breakfast with a bowl"),
-    ("m4", "scene", "an East Asian Chinese young child wearing a school backpack walking to school, morning street"),
+    ("m1", "scene", "a realistic photo of an East Asian Chinese little boy just waking up and stretching arms in bed in the morning, bright bedroom"),
+    ("m2", "scene", "a realistic photo of an East Asian Chinese little boy brushing teeth with a toothbrush at a bathroom sink"),
+    ("m3", "scene", "a realistic photo of an East Asian Chinese little boy sitting at a table eating breakfast with a bowl"),
+    ("m4", "scene", "a realistic photo of an East Asian Chinese little boy wearing a school backpack walking to school, morning street"),
     # ---- 種子變花 ----
     ("p1", "scene", "a single brown seed lying on dark brown soil, macro close up"),
     ("p2", "scene", "a tiny green sprout with two small leaves growing out of brown soil"),
