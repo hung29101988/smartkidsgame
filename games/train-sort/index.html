@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>小火車排排坐 ・ smartkidsgame</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/favicon.svg">
+<link rel="canonical" href="https://smartkidsgame.com/games/train-sort/">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-user-select:none; user-select:none;
+      -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
+  html,body { height:100%; overflow:hidden; }
+  body { font-family:"PingFang HK","PingFang TC","Heiti TC","Microsoft JhengHei",sans-serif; background:#bfe9ff; }
+  .screen { position:fixed; inset:0; display:none; flex-direction:column; }
+  .screen.show { display:flex; }
+
+  #homeBtn { position:fixed; top:2vmin; left:2vmin; z-index:120;
+    width:9vmin; height:9vmin; max-width:54px; max-height:54px; border-radius:50%; background:#fffef0; border:.6vmin solid #5b7a2e;
+    display:flex; align-items:center; justify-content:center; font-size:4.6vmin; line-height:1;
+    text-decoration:none; box-shadow:0 .7vmin 0 rgba(0,0,0,.18); }
+  #homeBtn:active { transform:translateY(.3vmin); }
+
+  /* ===== 開始畫面 ===== */
+  #startScreen { background:linear-gradient(#aee7ff 0%,#d8f4ff 55%,#bdee8e 55%,#8fd96b 100%);
+    align-items:center; justify-content:center; gap:3.5vmin; }
+  #startHero { width:60vmin; max-width:420px; }
+  .stitle { font-family:'Baloo 2',"PingFang HK",sans-serif; font-weight:800; color:#3a5a8a;
+    font-size:clamp(28px,9vmin,60px); text-shadow:0 .6vmin 0 #fff, 0 1.2vmin 2vmin rgba(0,0,0,.15); }
+  #playBtn { border:none; cursor:pointer; font-size:8vmin; line-height:1; padding-left:1vmin;
+    width:21vmin; height:21vmin; border-radius:50%; color:#fff;
+    background:radial-gradient(circle at 35% 30%,#8be78b,#2eaf5a);
+    box-shadow:0 1.4vmin 0 #1d7c3d; animation:pulse 1.2s ease-in-out infinite; }
+  #playBtn:active { transform:translateY(.8vmin); box-shadow:0 .6vmin 0 #1d7c3d; }
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.07)} }
+
+  /* ===== 遊戲畫面 ===== */
+  #gameScreen { background:linear-gradient(#aee7ff,#d8f4ff); }
+  #gameScreen.sc0 { background:linear-gradient(#aee7ff 0%,#d8f4ff 60%,#bdee8e 60%,#8fd96b 100%); } /* 草原 */
+  #gameScreen.sc1 { background:linear-gradient(#7fd4ff 0%,#bfe9ff 58%,#f2e2a8 58%,#e6cf7a 100%); } /* 海邊沙灘 */
+  #gameScreen.sc2 { background:linear-gradient(#bfe6c8 0%,#d8f0dd 58%,#8fbf6e 58%,#5f9a44 100%); } /* 森林 */
+  #gameScreen.sc3 { background:linear-gradient(#dff1ff 0%,#eef8ff 58%,#eaf4fb 58%,#cfe4f2 100%); } /* 雪地 */
+
+  /* 頂 bar */
+  #topbar { flex:0 0 auto; display:flex; align-items:center; gap:2vmin; padding:2.4vmin 3vmin 0 14vmin; z-index:5; }
+  #prompt { flex:1; background:rgba(255,255,255,.9); border-radius:50vmax; padding:1.4vmin 3vmin;
+    font-family:'Baloo 2',"PingFang HK",sans-serif; font-weight:800; color:#3a5a8a;
+    font-size:clamp(16px,4.6vmin,26px); display:flex; align-items:center; gap:2vmin; box-shadow:0 .6vmin 0 rgba(0,0,0,.1); }
+  #sayBtn { flex:none; width:9vmin; height:9vmin; max-width:52px; max-height:52px; border:none; border-radius:50%;
+    background:#8bd47a; color:#fff; font-size:5vmin; line-height:1; box-shadow:0 .7vmin 0 #5ca046; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; }
+  #sayBtn:active { transform:translateY(.3vmin); }
+  #station { flex:none; font-family:'Baloo 2',sans-serif; font-weight:800; color:#fff; font-size:clamp(15px,4vmin,22px);
+    background:rgba(90,120,60,.55); border-radius:50vmax; padding:.5vmin 2.2vmin; }
+
+  /* 火車區 */
+  #trainArea { flex:1; display:flex; flex-direction:column; justify-content:center; overflow:hidden; position:relative; }
+  #train { display:flex; align-items:flex-end; gap:1vmin; padding:0 4vmin; justify-content:center; will-change:transform; }
+  .loco { width:26vmin; max-width:170px; flex:none; }
+  .loco svg { width:100%; height:auto; display:block; }
+  .carriage { flex:none; width:19vmin; max-width:120px; }
+  .cbody { aspect-ratio:1/1; border-radius:2.4vmin; background:#fff; border:.7vmin dashed #b7c8d6;
+    display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative; }
+  .carriage.filled .cbody { border-style:solid; border-color:#fff; box-shadow:0 1vmin 0 rgba(0,0,0,.12); cursor:pointer; }
+  .wheels { display:flex; justify-content:space-around; margin-top:-.4vmin; padding:0 2vmin; }
+  .wheels i { width:4.4vmin; height:4.4vmin; max-width:26px; max-height:26px; border-radius:50%;
+    background:#3a3a3a; border:.7vmin solid #7a7a7a; display:block; }
+  .cnum { position:absolute; top:.4vmin; left:.8vmin; font-family:'Baloo 2',sans-serif; font-weight:800;
+    color:#c9d4e0; font-size:3.4vmin; }
+  .carriage.filled .cnum { color:#8bb0d8; }
+
+  /* 軌道 */
+  #track { height:3vmin; margin:1vmin 0 0; background:
+      linear-gradient(#8a6a4a,#6a4a2a) center/100% .9vmin no-repeat,
+      repeating-linear-gradient(90deg, #a98a6a 0 1.4vmin, transparent 1.4vmin 6vmin) center/100% 100% no-repeat;
+    border-top:.4vmin solid #b0b0b0; }
+
+  /* 月台（卡池）*/
+  #yard { flex:0 0 auto; min-height:26vmin; display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
+    gap:2.4vmin; padding:2.6vmin 4vmin calc(4vmin + env(safe-area-inset-bottom));
+    background:rgba(255,255,255,.35); border-top:.5vmin solid rgba(255,255,255,.6); }
+  .card { width:19vmin; max-width:120px; aspect-ratio:1/1; border-radius:2.4vmin; background:#fff;
+    border:.7vmin solid #fff; box-shadow:0 1vmin 0 rgba(0,0,0,.14); cursor:pointer;
+    display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .card:active { transform:translateY(.6vmin) scale(.97); }
+  .card svg, .cbody svg { width:86%; height:86%; }
+  .emoji { font-size:min(11vmin,70px); line-height:1; }
+  .pop { animation:pop .28s ease; }
+  @keyframes pop { 0%{transform:scale(.6)} 60%{transform:scale(1.12)} 100%{transform:scale(1)} }
+  .shake { animation:shake .4s ease; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-2vmin)} 40%{transform:translateX(2vmin)} 60%{transform:translateX(-1.4vmin)} 80%{transform:translateX(1.4vmin)} }
+
+  /* 煙 */
+  .smoke { position:absolute; border-radius:50%; background:rgba(255,255,255,.85); pointer-events:none; }
+  @keyframes puff { 0%{transform:translateY(0) scale(.4); opacity:.9} 100%{transform:translateY(-22vmin) scale(1.6); opacity:0} }
+
+  /* 慶祝 / 完成 */
+  #winScreen { background:linear-gradient(#ffe8a8,#ffd36b); align-items:center; justify-content:center; gap:3vmin; text-align:center; }
+  #winScreen .stitle { color:#c0392b; }
+  #winScreen .sub { font-family:'Baloo 2',"PingFang HK",sans-serif; font-weight:800; color:#8a5a1a; font-size:clamp(18px,5vmin,30px); }
+  .replay { border:none; cursor:pointer; font-family:'Baloo 2',"PingFang HK",sans-serif; font-weight:800; color:#fff;
+    background:#5fbf3f; border-radius:50vmax; padding:2vmin 6vmin; font-size:clamp(18px,5vmin,28px); box-shadow:0 1vmin 0 #43992a; }
+  .replay:active { transform:translateY(.5vmin); }
+
+  /* 休息 */
+  #restScreen { background:rgba(20,40,60,.92); color:#fff; align-items:center; justify-content:center; gap:3vmin; z-index:200; }
+  #restScreen .stitle { color:#ffd86b; }
+  #restTimer { font-family:'Baloo 2',sans-serif; font-weight:800; font-size:12vmin; }
+</style>
+</head>
+<body>
+
+<a id="homeBtn" href="../../" aria-label="返回主頁">🏠</a>
+
+<!-- 開始 -->
+<div id="startScreen" class="screen show">
+  <div id="startHero"></div>
+  <div class="stitle">小火車排排坐</div>
+  <button id="playBtn">▶</button>
+</div>
+
+<!-- 遊戲 -->
+<div id="gameScreen" class="screen">
+  <div id="topbar">
+    <div id="prompt"><span id="promptText">由細到大排！</span></div>
+    <button id="sayBtn" aria-label="讀多次">🔊</button>
+    <div id="station">第 1 站</div>
+  </div>
+  <div id="trainArea">
+    <div id="train"></div>
+    <div id="track"></div>
+  </div>
+  <div id="yard"></div>
+</div>
+
+<!-- 完成 -->
+<div id="winScreen" class="screen">
+  <div class="stitle">🎉 到達終點站！</div>
+  <div class="sub" id="winSub">你排好晒所有火車！</div>
+  <button class="replay" id="replayBtn">再玩一次 🚂</button>
+</div>
+
+<!-- 休息 -->
+<div id="restScreen" class="screen">
+  <div class="stitle">抖一抖 😴</div>
+  <div class="sub" style="color:#fff">合埋眼，望下遠處</div>
+  <div id="restTimer">10:00</div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+/* ===== 關卡 ===== */
+// type: size / count / height / emoji ；dir: asc/desc（emoji 用固定次序）
+const LEVELS = [
+  {type:"size",   dir:"asc",  obj:"ball",  n:3, prompt:"由細到大排！"},
+  {type:"count",  dir:"asc",  n:3,         prompt:"由少到多排！"},
+  {type:"height", dir:"asc",  n:3,         prompt:"由矮到高排！"},
+  {type:"size",   dir:"asc",  obj:"apple", n:4, prompt:"由細到大排！"},
+  {type:"count",  dir:"asc",  n:4,         prompt:"由少到多排！"},
+  {type:"emoji",  prompt:"由朝到晚，邊件事先做？", items:["🌅","🪥","🍳","🎒"], say:["起身","刷牙","食早餐","返學"]},
+  {type:"size",   dir:"desc", obj:"star",  n:4, prompt:"由大到細排！"},
+  {type:"emoji",  prompt:"種子點樣變花？", items:["🌰","🌱","🌿","🌸"], say:["種子","發芽","長大","開花"]},
+  {type:"height", dir:"desc", n:4,         prompt:"由高到矮排！"},
+  {type:"count",  dir:"asc",  n:5,         prompt:"由少到多排！"},
+];
+
+let _gid = 0;
+function locoSVG(){
+  const u = "L"+(_gid++);
+  return `<svg viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
+    <defs><radialGradient id="${u}b" cx="40%" cy="30%" r="80%"><stop offset="0" stop-color="#ff8a80"/><stop offset="1" stop-color="#d62b2b"/></radialGradient>
+      <radialGradient id="${u}f" cx="42%" cy="35%" r="75%"><stop offset="0" stop-color="#ffeed8"/><stop offset="1" stop-color="#f5c694"/></radialGradient></defs>
+    <ellipse cx="60" cy="90" rx="52" ry="5" fill="rgba(0,0,0,.12)"/>
+    <rect x="12" y="42" width="86" height="36" rx="8" fill="url(#${u}b)" stroke="#a32424" stroke-width="2"/>
+    <rect x="70" y="20" width="34" height="42" rx="7" fill="#c0392b" stroke="#a32424" stroke-width="2"/>
+    <!-- 車窗 + 火車長（女仔） -->
+    <circle cx="87" cy="40" r="13" fill="#bfe9ff" stroke="#fff" stroke-width="2.5"/>
+    <g>
+      <circle cx="80" cy="35" r="3.4" fill="#5a3a22"/><circle cx="94" cy="35" r="3.4" fill="#5a3a22"/>
+      <circle cx="80" cy="35" r="1.6" fill="#ff5d73"/><circle cx="94" cy="35" r="1.6" fill="#ff5d73"/>
+      <circle cx="87" cy="42" r="8.5" fill="url(#${u}f)"/>
+      <path d="M78 40 Q78 32 87 32 Q96 32 96 40 Q92 36 87 37.5 Q82 36 78 40 Z" fill="#5a3a22"/>
+      <circle cx="84" cy="42" r="1.5" fill="#2b2b2b"/><circle cx="90" cy="42" r="1.5" fill="#2b2b2b"/>
+      <path d="M84.5 45 Q87 47 89.5 45" stroke="#c2502f" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+    </g>
+    <rect x="20" y="16" width="12" height="20" rx="3" fill="#4a4a4a"/><rect x="16" y="12" width="20" height="7" rx="3" fill="#4a4a4a"/>
+    <circle cx="26" cy="82" r="12" fill="#3a3a3a" stroke="#7a7a7a" stroke-width="4"/>
+    <circle cx="60" cy="84" r="9" fill="#3a3a3a" stroke="#7a7a7a" stroke-width="3.5"/>
+    <circle cx="86" cy="84" r="9" fill="#3a3a3a" stroke="#7a7a7a" stroke-width="3.5"/>
+    <circle cx="26" cy="82" r="3" fill="#bbb"/>
+  </svg>`;
+}
+
+// 卡內容
+const COLORS = ["#ff6b6b","#4cb0e0","#f5a623","#8bd47a","#a97fd8"];
+function contentSVG(level, item){
+  if(level.type==="size"){
+    const r = 14 + item.size*11;   // size 1..n
+    const col = "#ff6b6b";
+    if(level.obj==="apple") return `<svg viewBox="0 0 100 100"><path d="M50 ${50-r} C${50-r*.9} ${50-r} ${50-r} ${50+r*.5} ${50-r*.55} ${50+r*.8} C${50-r*.2} ${50+r} ${50+r*.2} ${50+r} ${50+r*.55} ${50+r*.8} C${50+r} ${50+r*.5} ${50+r*.9} ${50-r} 50 ${50-r} Z" fill="#e23b3b"/><rect x="48" y="${50-r-6}" width="4" height="8" rx="2" fill="#7a5230"/><ellipse cx="${57}" cy="${50-r-2}" rx="7" ry="4" fill="#6cc24a"/></svg>`;
+    if(level.obj==="star"){ const R=r, pts=star(50,52,R,R*0.45,5); return `<svg viewBox="0 0 100 100"><polygon points="${pts}" fill="#ffcf3a" stroke="#e8a11a" stroke-width="2"/></svg>`; }
+    return `<svg viewBox="0 0 100 100"><circle cx="50" cy="52" r="${r}" fill="${col}"/><ellipse cx="${50-r*.35}" cy="${52-r*.4}" rx="${r*.28}" ry="${r*.18}" fill="rgba(255,255,255,.6)"/></svg>`;
+  }
+  if(level.type==="height"){
+    const h = 22 + item.h*16;   // tree height
+    return `<svg viewBox="0 0 100 100"><rect x="46" y="${88-h*.28}" width="8" height="${h*.28}" fill="#8a5a30"/><polygon points="50,${88-h} 30,${88-h*.35} 70,${88-h*.35}" fill="#4f9a44"/><polygon points="50,${88-h*.7} 34,${88-h*.28} 66,${88-h*.28}" fill="#5faa50"/></svg>`;
+  }
+  if(level.type==="count"){
+    let dots="", n=item.n; const positions=dotPos(n);
+    positions.forEach(p=>{ dots+=`<circle cx="${p[0]}" cy="${p[1]}" r="9" fill="#4cb0e0" stroke="#2f8fc4" stroke-width="2"/>`; });
+    return `<svg viewBox="0 0 100 100">${dots}</svg>`;
+  }
+  if(level.type==="emoji"){ return `<div class="emoji">${item.emoji}</div>`; }
+  return "";
+}
+function star(cx,cy,R,r,n){ let p=[]; for(let i=0;i<n*2;i++){ const rad=(i%2?r:R), a=Math.PI*i/n - Math.PI/2; p.push((cx+rad*Math.cos(a)).toFixed(1)+","+(cy+rad*Math.sin(a)).toFixed(1)); } return p.join(" "); }
+function dotPos(n){ const m={1:[[50,50]],2:[[35,50],[65,50]],3:[[50,32],[35,62],[65,62]],4:[[36,36],[64,36],[36,64],[64,64]],5:[[36,36],[64,36],[50,50],[36,64],[64,64]]}; return m[n]||m[5]; }
+
+/* 建立一關嘅 items（含 rank 正確位置）*/
+function buildItems(level){
+  const n = level.type==="emoji" ? level.items.length : level.n;
+  let items=[];
+  if(level.type==="emoji"){
+    items = level.items.map((e,i)=>({emoji:e, say:level.say[i], rank:i}));
+  } else if(level.type==="size"){
+    for(let s=1;s<=n;s++) items.push({size:s, rank: level.dir==="asc"? s-1 : n-s, say:null});
+  } else if(level.type==="height"){
+    for(let h=1;h<=n;h++) items.push({h:h, rank: level.dir==="asc"? h-1 : n-h, say:null});
+  } else if(level.type==="count"){
+    for(let c=1;c<=n;c++) items.push({n:c, rank: level.dir==="asc"? c-1 : n-c, say:String(c)});
+  }
+  // 洗牌
+  for(let i=items.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [items[i],items[j]]=[items[j],items[i]]; }
+  items.forEach((it,i)=>it.id=i);
+  return items;
+}
+
+/* ===== 遊戲狀態 ===== */
+let lvl=0, items=[], slots=[], busy=false;
+
+function render(){
+  const level=LEVELS[lvl];
+  const n = level.type==="emoji" ? level.items.length : level.n;
+  $("gameScreen").className = "screen show sc"+(Math.floor(lvl/3)%4);
+  $("station").textContent = "第 "+(lvl+1)+" 站";
+  $("promptText").textContent = level.prompt;
+  // 火車：車頭 + n 卡
+  let t = `<div class="loco">${locoSVG()}</div>`;
+  for(let i=0;i<n;i++){
+    const cid = slots[i];
+    const filled = cid!=null;
+    const inner = filled ? contentSVG(level, items.find(x=>x.id===cid)) : "";
+    t += `<div class="carriage ${filled?'filled':''}" data-slot="${i}">
+            <div class="cbody">${filled?inner:`<span class="cnum">${i+1}</span>`}</div>
+            <div class="wheels"><i></i><i></i></div>
+          </div>`;
+  }
+  $("train").innerHTML = t;
+  $("train").style.transform="";
+  // 月台：未擺入嘅卡
+  const placed = new Set(slots.filter(x=>x!=null));
+  $("yard").innerHTML = items.filter(x=>!placed.has(x.id))
+    .map(x=>`<div class="card" data-id="${x.id}">${contentSVG(level,x)}</div>`).join("");
+  bind();
+}
+
+function bind(){
+  $("yard").querySelectorAll(".card").forEach(el=>{
+    el.onclick = ()=>{ if(busy) return; placeCard(+el.dataset.id); };
+  });
+  $("train").querySelectorAll(".carriage.filled").forEach(el=>{
+    el.onclick = ()=>{ if(busy) return; removeSlot(+el.dataset.slot); };
+  });
+}
+
+function firstEmpty(){ return slots.findIndex(s=>s==null); }
+
+function placeCard(id){
+  const s=firstEmpty(); if(s<0) return;
+  slots[s]=id; sfx.click();
+  render();
+  const cb=$("train").querySelector(`.carriage[data-slot="${s}"] .cbody`); if(cb) cb.classList.add("pop");
+  const it=items.find(x=>x.id===id); if(it && it.say) speak(it.say);
+  if(firstEmpty()<0) setTimeout(check, 350);
+}
+function removeSlot(s){ slots[s]=null; sfx.click(); render(); }
+
+function check(){
+  // 正確 = 每卡 rank === 位置
+  const ok = slots.every((cid,i)=> items.find(x=>x.id===cid).rank===i );
+  if(ok){ depart(); }
+  else {
+    sfx.wrong(); $("train").classList.add("shake");
+    speak("再試多次");
+    setTimeout(()=>$("train").classList.remove("shake"),450);
+  }
+}
+
+function depart(){
+  busy=true; sfx.win(); speak("排啱喇！開車！");
+  puffSmoke();
+  const tr=$("train");
+  tr.style.transition="transform 1.3s cubic-bezier(.4,.05,.6,1)";
+  tr.style.transform="translateX(130vw)";
+  setTimeout(()=>{
+    tr.style.transition="";
+    lvl++;
+    if(lvl>=LEVELS.length){ win(); busy=false; return; }
+    slots = new Array(LEVELS[lvl].type==="emoji"?LEVELS[lvl].items.length:LEVELS[lvl].n).fill(null);
+    items = buildItems(LEVELS[lvl]);
+    render();
+    // 新火車由左入
+    tr.style.transition="none"; tr.style.transform="translateX(-130vw)";
+    requestAnimationFrame(()=>{ tr.style.transition="transform .7s ease-out"; tr.style.transform="translateX(0)"; });
+    setTimeout(()=>{ busy=false; speak(LEVELS[lvl].prompt); }, 750);
+  }, 1300);
+}
+
+function puffSmoke(){
+  const area=$("trainArea"); const loco=$("train").querySelector(".loco");
+  if(!loco) return; const r=loco.getBoundingClientRect(); const ar=area.getBoundingClientRect();
+  for(let i=0;i<6;i++){ setTimeout(()=>{
+    const s=document.createElement("div"); s.className="smoke";
+    const sz=4+Math.random()*4; s.style.width=sz+"vmin"; s.style.height=sz+"vmin";
+    s.style.left=(r.left-ar.left+r.width*0.18)+"px"; s.style.top=(r.top-ar.top+r.height*0.1)+"px";
+    s.style.animation="puff 1.1s ease-out forwards";
+    area.appendChild(s); setTimeout(()=>s.remove(),1100);
+  }, i*120); }
+}
+
+function startLevel(){
+  lvl=0; busy=false;
+  slots = new Array(LEVELS[0].type==="emoji"?LEVELS[0].items.length:LEVELS[0].n).fill(null);
+  items = buildItems(LEVELS[0]);
+  showScreen("gameScreen"); render(); speak(LEVELS[0].prompt);
+}
+function win(){ showScreen("winScreen"); sfx.win(); speak("嘩！你排好晒所有火車，好叻呀！"); }
+
+function showScreen(id){ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("show")); $(id).classList.add("show"); }
+
+/* ===== 語音（廣東話）===== */
+let voice=null;
+function pickVoice(){ const vs=speechSynthesis.getVoices(); voice=vs.find(v=>/zh-HK|yue/i.test(v.lang))||vs.find(v=>/zh-TW|zh-Hant/i.test(v.lang))||vs.find(v=>/^zh/i.test(v.lang))||null; }
+if("speechSynthesis" in window){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
+function speak(t){ if(!("speechSynthesis" in window))return; try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang="zh-HK"; u.rate=.85; if(voice)u.voice=voice; speechSynthesis.speak(u);}catch(e){} }
+
+/* ===== 音效 ===== */
+let AC; function ac(){ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); return AC; }
+function tone(f,d,t,g){ try{const c=ac(),o=c.createOscillator(),ga=c.createGain(); o.type=t||"sine"; o.frequency.value=f; o.connect(ga); ga.connect(c.destination); ga.gain.setValueAtTime(g||.15,c.currentTime); ga.gain.exponentialRampToValueAtTime(.001,c.currentTime+d); o.start(); o.stop(c.currentTime+d);}catch(e){} }
+const sfx = {
+  click:()=>tone(520,.08,"triangle",.12),
+  wrong:()=>{tone(200,.18,"sawtooth",.12); setTimeout(()=>tone(160,.2,"sawtooth",.1),120);},
+  win:()=>{[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,.18,"triangle",.14),i*90));},
+};
+
+/* ===== 開場人物（女仔揮手）===== */
+$("startHero").innerHTML = `<svg viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(20 10)">
+    ${locoSVG().replace('<svg viewBox="0 0 120 100"','<svg x="0" y="0" width="120" height="100" viewBox="0 0 120 100"')}
+  </g>
+  <g transform="translate(150 34)">
+    <rect x="0" y="40" width="30" height="20" rx="4" fill="#ff9f43"/>
+    <rect x="6" y="30" width="30" height="20" rx="4" fill="#4cb0e0"/>
+    <rect x="12" y="20" width="30" height="20" rx="4" fill="#8bd47a"/>
+  </g>
+</svg>`;
+
+/* ===== 事件 ===== */
+$("playBtn").addEventListener("click", ()=>{ if(inRest())return; ac(); engaged=true; lastTick=Date.now(); startLevel(); });
+$("replayBtn").addEventListener("click", ()=>{ if(inRest())return; startLevel(); });
+$("sayBtn").addEventListener("click", (e)=>{ e.stopPropagation(); speak(LEVELS[lvl]?LEVELS[lvl].prompt:""); });
+
+/* ===== 護眼時間限制（全平台共用）===== */
+const LIMIT_PLAY=10*60*1000, LIMIT_REST=10*60*1000, IDLE_RESET=10*60*1000;
+let playMs=0, restUntil=0, lastTick=0, engaged=false, lastActive=0;
+try{ playMs=Number(localStorage.getItem("wg_playMs"))||0; restUntil=Number(localStorage.getItem("wg_restUntil"))||0; lastActive=Number(localStorage.getItem("wg_lastActive"))||0; }catch(e){}
+function maybeResetIdle(){ if(inRest())return; if(playMs>0 && lastActive && (Date.now()-lastActive)>=IDLE_RESET){ playMs=0; try{localStorage.setItem("wg_playMs","0");}catch(e){} } }
+function fmtTime(ms){ const s=Math.max(0,Math.ceil(ms/1000)); return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0"); }
+function inRest(){ return restUntil>Date.now(); }
+function enterRest(){ try{speechSynthesis.cancel();}catch(e){} $("restScreen").classList.add("show"); $("restTimer").textContent=fmtTime(restUntil-Date.now()); speak("玩咗好耐喇，抖一抖，合埋眼休息吓，等陣再玩啦"); }
+function endRest(){ $("restScreen").classList.remove("show"); playMs=0; restUntil=0; lastTick=0; engaged=false;
+  try{localStorage.setItem("wg_playMs","0"); localStorage.removeItem("wg_restUntil");}catch(e){} showScreen("startScreen"); }
+function timeTick(){ const now=Date.now();
+  if(inRest()){ if(!$("restScreen").classList.contains("show")) enterRest(); $("restTimer").textContent=fmtTime(restUntil-now); return; }
+  if($("restScreen").classList.contains("show")){ endRest(); return; }
+  if(engaged && document.visibilityState==="visible"){ if(lastTick) playMs+=now-lastTick; lastTick=now; lastActive=now;
+    try{localStorage.setItem("wg_playMs",String(playMs)); localStorage.setItem("wg_lastActive",String(now));}catch(e){}
+    if(playMs>=LIMIT_PLAY){ restUntil=now+LIMIT_REST; try{localStorage.setItem("wg_restUntil",String(restUntil));}catch(e){} enterRest(); }
+  } else { lastTick=now; } }
+setInterval(timeTick,1000);
+document.addEventListener("visibilitychange", ()=>{ lastTick=0; if(document.visibilityState==="visible") maybeResetIdle(); });
+maybeResetIdle();
+if(inRest()) enterRest();
+</script>
+<!-- Cloudflare Web Analytics -->
+<script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "f28d4375be774f74a246a442967a04f9"}'></script>
+</body>
+</html>
