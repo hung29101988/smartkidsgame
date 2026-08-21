@@ -60,10 +60,10 @@ CARDS = [
     ("b3", "scene", "a green butterfly chrysalis cocoon hanging from a small twig, macro close up"),
     ("b4", "scene", "a beautiful colourful butterfly with fully open wings resting on a flower"),
     # ---- 洗手因果：玩污手 → 洗手 → 抹乾 → 食嘢 ----
-    ("w1", "scene", "an East Asian Chinese young child playing outdoors on the ground, hands are dirty and muddy, showing dirty messy hands, close up"),
-    ("w2", "scene", "an East Asian Chinese young child washing both hands with soap under a running water tap at a sink"),
-    ("w3", "scene", "an East Asian Chinese young child drying both clean hands with a clean towel"),
-    ("w4", "scene", "an East Asian Chinese young child happily eating food with clean hands at a table"),
+    ("w1", "scene", "a realistic photo of an East Asian Chinese little girl playing outdoors on the ground, hands are dirty and muddy, showing dirty messy hands, close up"),
+    ("w2", "scene", "a realistic photo of an East Asian Chinese little girl washing both hands with soap under a running water tap at a sink"),
+    ("w3", "scene", "a realistic photo of an East Asian Chinese little girl drying both clean hands with a clean towel"),
+    ("w4", "scene", "a realistic photo of an East Asian Chinese little girl happily eating food with clean hands at a table"),
     # ---- 一日天色（由朝到晚）----
     ("d1", "scene", "early morning daytime sky, a soft pale light blue sky with a small low morning sun near the horizon, fresh bright gentle morning light, calm scenery, mostly blue not orange, no people"),
     ("d2", "scene", "a bright blue clear midday sky with a shining sun over a green landscape, no people"),
