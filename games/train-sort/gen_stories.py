@@ -31,7 +31,7 @@ REF = ("a realistic photo, clear front portrait headshot of {subj}, "
 STORIES = [
     {"id":"bath", "char":"a happy East Asian Chinese little girl about 5 years old, shoulder-length black hair, cheerful face",
      "panels":[
-        ("bath1","a full-body wide shot of a little girl in a towel standing on the floor next to a large white bathtub full of bubbles in a bright bathroom, about to take a bath, the whole bathtub and the whole child are visible from a distance","準備沖涼"),
+        ("bath1","a full-body wide shot of a little girl fully dressed in her outdoor street clothes standing in a bright bathroom holding a folded clean towel in her arms, getting ready to take a bath, a bathtub behind her, whole body visible","準備沖涼"),
         ("bath2","a wide shot of a little girl sitting inside a big bubble bath in a bathtub playing with bubbles, showing the whole bathtub and the bathroom around it","搽番梘沖水"),
         ("bath3","a full-body wide shot of a little girl standing on the bathroom floor wrapped in a big fluffy towel drying herself after a bath, whole body visible from head to feet","抹乾身"),
         ("bath4","a full-body wide shot of a little girl standing in a bedroom wearing clean pyjamas, clean fresh and happy after a bath, whole body visible from head to feet","著返睡衣"),
@@ -41,35 +41,21 @@ STORIES = [
         ("bake1","a little boy mixing cake batter in a big bowl with a whisk in a kitchen","攪拌粉漿"),
         ("bake2","a little boy pouring cake batter into a round cake baking pan","倒入蛋糕模"),
         ("bake3","a little boy putting a cake pan into an oven","放入焗爐"),
-        ("bake4","a little boy proudly holding a finished decorated birthday cake","完成蛋糕"),
+        ("bake4","a full-body shot of a little boy standing in the kitchen holding up a whole complete finished decorated round birthday cake with both hands, the entire cake is clearly visible held in his hands, proud and very happy","完成蛋糕"),
      ]},
     {"id":"doc", "char":"an East Asian Chinese little girl about 5 years old, hair in a ponytail, gentle face",
      "panels":[
         ("doc1","a little girl looking sick and tired lying on a sofa with a thermometer, feeling unwell","發燒唔舒服"),
         ("doc2","a little girl being examined by a friendly doctor using a stethoscope in a clinic","去睇醫生"),
         ("doc3","a little girl taking medicine from a spoon at home","食藥"),
-        ("doc4","a healthy happy little girl smiling and playing again, all better","好返晒"),
-     ]},
-    {"id":"road", "char":"an East Asian Chinese little boy about 5 years old, short black hair, wearing a blue jacket",
-     "panels":[
-        ("road1","a little boy standing at a pedestrian crossing waiting, a red do-not-walk traffic light showing","等紅燈"),
-        ("road2","a little boy at a pedestrian crossing as the green walk traffic light lights up","綠燈著咗"),
-        ("road3","a little boy looking left and right carefully before crossing the road","望左望右"),
-        ("road4","a little boy safely reaching the other side of a zebra crossing","安全過到馬路"),
-     ]},
-    {"id":"slide", "char":"a lively East Asian Chinese little girl about 5 years old, two ponytails, pink shirt",
-     "panels":[
-        ("slide1","a little girl waiting in line at the bottom of a colourful playground slide","排隊等玩"),
-        ("slide2","a little girl climbing up the ladder steps of a playground slide","爬樓梯"),
-        ("slide3","a little girl sliding down a playground slide","滑落嚟"),
-        ("slide4","a little girl happily landing at the bottom of the slide","開心落地"),
+        ("doc4","a full-body shot of a healthy happy little girl standing and giving a big thumbs up with her hand, all better, cheerful and smiling, the thumbs-up gesture is clearly visible","好返晒 👍"),
      ]},
     # 生命週期：冇角色
     {"id":"frog", "char":None,
      "panels":[
         ("frog1","a cluster of jelly-like frog eggs floating in clear pond water, macro close up","青蛙蛋"),
-        ("frog2","a single small black tadpole swimming in pond water","蝌蚪"),
-        ("frog3","a dark round-headed tadpole with a long tail that has just grown two tiny back legs, still clearly a tadpole turning into a frog, swimming in pond water, NOT a lizard, NOT a newt, NOT a salamander","長出後腳"),
+        ("frog2","one tiny small black tadpole swimming in a large pond, the tadpole is small in the frame surrounded by plenty of green pond water, wide underwater view","蝌蚪"),
+        ("frog3","a black tadpole with a long tail and two clearly visible obvious well-developed back legs sticking out from its body, the frog legs are prominent and easy to see, a froglet in pond water, NOT a lizard, NOT a newt, NOT a salamander","長出後腳"),
         ("frog4","one green frog sitting on a green leaf by a pond","變青蛙"),
      ]},
 ]
