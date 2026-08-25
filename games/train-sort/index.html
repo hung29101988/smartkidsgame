@@ -172,27 +172,46 @@ const $ = id => document.getElementById(id);
 /* ===== 關卡 ===== */
 // type: size / count / height / emoji ；dir: asc/desc（emoji 用固定次序）
 // obj = MiniMax 圖 key（img/<key>.jpg）；emoji 用 imgs[] 逐格情境圖
-const LEVELS = [
+// 量度題池（大細 / 數量 / 高矮）
+const MEASURE = [
   {type:"size",   dir:"asc",  obj:"ball",  n:3, prompt:"由細到大排！"},
   {type:"count",  dir:"asc",  obj:"duck",  n:3, prompt:"由少到多排！"},
   {type:"height", dir:"asc",  obj:"tree",  n:3, prompt:"由矮到高排！"},
-  {type:"emoji",  prompt:"由朝到晚，邊件事先做？", items:["🌅","🪥","🍳","🎒"], imgs:["m1","m2","m3","m4"], say:["起身","刷牙","食早餐","返學"]},
   {type:"size",   dir:"asc",  obj:"apple", n:4, prompt:"由細到大排！"},
   {type:"count",  dir:"asc",  obj:"strawberry", n:4, prompt:"由少到多排！"},
-  {type:"emoji",  prompt:"由細到大，人係點樣長大？", items:["👶","👧","👩","👵"], imgs:["g1","g2","g3","g4"], say:["嬰兒","小朋友","大人","老人家"]},
   {type:"size",   dir:"desc", obj:"star",  n:4, prompt:"由大到細排！"},
-  {type:"emoji",  prompt:"玩到手污糟，跟住應該點做？", items:["🙌","🚰","🧻","🍎"], imgs:["w1","w2","w3","w4"], say:["玩耍整污手","開水喉洗手","抹乾手","乾淨先食嘢"]},
   {type:"height", dir:"desc", obj:"tree",  n:4, prompt:"由高到矮排！"},
-  {type:"emoji",  prompt:"毛毛蟲點樣變蝴蝶？", items:["🥚","🐛","🛡️","🦋"], imgs:["b1","b2","b3","b4"], say:["蟲蛋","毛毛蟲","結蛹","蝴蝶"]},
   {type:"count",  dir:"asc",  obj:"apple", n:5, prompt:"由少到多排！"},
-  {type:"emoji",  prompt:"由朝到晚，天色點樣變？", items:["🌅","☀️","🌇","🌙"], imgs:["d1","d2","d3","d4"], say:["日出","中午","黃昏","夜晚"]},
-  {type:"emoji",  prompt:"種子點樣變花？", items:["🌰","🌱","🌿","🌸"], imgs:["p1","p2","p3","p4"], say:["種子","發芽","長大","開花"]},
 ];
+// 故事排序池（每個故事角色一致；emoji 係後備，有圖時用圖）
+const STORIES = [
+  {type:"emoji", prompt:"由朝到晚，邊件事先做？", items:["🌅","🪥","🍳","🎒"], imgs:["m1","m2","m3","m4"], say:["起身","刷牙","食早餐","返學"]},
+  {type:"emoji", prompt:"由細到大，人係點樣長大？", items:["👶","👧","👩","👵"], imgs:["g1","g2","g3","g4"], say:["嬰兒","小朋友","大人","老人家"]},
+  {type:"emoji", prompt:"玩到手污糟，跟住應該點做？", items:["🙌","🚰","🧻","🍎"], imgs:["w1","w2","w3","w4"], say:["玩耍整污手","開水喉洗手","抹乾手","乾淨先食嘢"]},
+  {type:"emoji", prompt:"毛毛蟲點樣變蝴蝶？", items:["🥚","🐛","🛡️","🦋"], imgs:["b1","b2","b3","b4"], say:["蟲蛋","毛毛蟲","結蛹","蝴蝶"]},
+  {type:"emoji", prompt:"由朝到晚，天色點樣變？", items:["🌅","☀️","🌇","🌙"], imgs:["d1","d2","d3","d4"], say:["日出","中午","黃昏","夜晚"]},
+  {type:"emoji", prompt:"種子點樣變花？", items:["🌰","🌱","🌿","🌸"], imgs:["p1","p2","p3","p4"], say:["種子","發芽","長大","開花"]},
+  {type:"emoji", prompt:"沖涼嘅次序係點？", items:["🛁","🧼","🧻","👕"], imgs:["bath1","bath2","bath3","bath4"], say:["準備沖涼","搽番梘沖水","抹乾身","著返睡衣"]},
+  {type:"emoji", prompt:"點樣整蛋糕？", items:["🥣","🍥","🔥","🎂"], imgs:["bake1","bake2","bake3","bake4"], say:["攪拌粉漿","倒入蛋糕模","放入焗爐","完成蛋糕"]},
+  {type:"emoji", prompt:"生病之後會點？", items:["🤒","🩺","💊","😀"], imgs:["doc1","doc2","doc3","doc4"], say:["發燒唔舒服","去睇醫生","食藥","好返晒"]},
+  {type:"emoji", prompt:"點樣安全過馬路？", items:["🔴","🟢","👀","🚸"], imgs:["road1","road2","road3","road4"], say:["等紅燈","綠燈著咗","望左望右","安全過到馬路"]},
+  {type:"emoji", prompt:"玩滑梯嘅次序？", items:["🧍","🪜","🛝","🎉"], imgs:["slide1","slide2","slide3","slide4"], say:["排隊等玩","爬樓梯","滑落嚟","開心落地"]},
+  {type:"emoji", prompt:"青蛙點樣長大？", items:["🥚","🐛","🐸","🐸"], imgs:["frog1","frog2","frog3","frog4"], say:["青蛙蛋","蝌蚪","長出後腳","變青蛙"]},
+];
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+// 每盤：1 易量度題起手 + 3 量度 + 5 故事，打亂次序（共 9 站）
+function buildPlaylist(){
+  const meas = shuffle(MEASURE);
+  const easy = meas.find(l=>l.n===3) || meas[0];
+  const restMeas = shuffle(MEASURE.filter(l=>l!==easy)).slice(0,3);
+  const stories = shuffle(STORIES).slice(0,5);
+  return [easy].concat(shuffle(restMeas.concat(stories)));
+}
+let LEVELS = buildPlaylist();
 
 /* ===== MiniMax 圖預載（未有圖時 fallback 返 SVG）===== */
-const IMG_KEYS = ["ball","apple","star","duck","strawberry","tree",
-  "m1","m2","m3","m4","p1","p2","p3","p4",
-  "g1","g2","g3","g4","b1","b2","b3","b4","w1","w2","w3","w4","d1","d2","d3","d4"];
+const IMG_KEYS = (()=>{ const s=new Set(["ball","apple","star","duck","strawberry","tree"]);
+  STORIES.forEach(st=>(st.imgs||[]).forEach(k=>s.add(k))); return [...s]; })();
 const IMGREADY = {};
 function preloadImgs(cb){
   let left = IMG_KEYS.length; if(!left){ cb&&cb(); return; }
@@ -407,6 +426,7 @@ function puffSmoke(){
 }
 
 function startLevel(){
+  LEVELS = buildPlaylist();
   lvl=0; busy=false;
   slots = new Array(LEVELS[0].type==="emoji"?LEVELS[0].items.length:LEVELS[0].n).fill(null);
   items = buildItems(LEVELS[0]);
