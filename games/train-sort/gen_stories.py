@@ -31,10 +31,10 @@ REF = ("a realistic photo, clear front portrait headshot of {subj}, "
 STORIES = [
     {"id":"bath", "char":"a happy East Asian Chinese little girl about 5 years old, shoulder-length black hair, cheerful face",
      "panels":[
-        ("bath1","a little girl wrapped in a towel standing next to a bathtub full of white bubbles, about to take a bath","準備沖涼"),
-        ("bath2","a little girl sitting inside a bubble bath washing herself with soap","搽番梘沖水"),
-        ("bath3","a little girl wrapped in a big fluffy towel drying herself after a bath","抹乾身"),
-        ("bath4","a little girl wearing clean pyjamas, clean fresh and happy after a bath","著返睡衣"),
+        ("bath1","a full-body wide shot of a little girl in a towel standing on the floor next to a large white bathtub full of bubbles in a bright bathroom, about to take a bath, the whole bathtub and the whole child are visible from a distance","準備沖涼"),
+        ("bath2","a wide shot of a little girl sitting inside a big bubble bath in a bathtub playing with bubbles, showing the whole bathtub and the bathroom around it","搽番梘沖水"),
+        ("bath3","a full-body wide shot of a little girl standing on the bathroom floor wrapped in a big fluffy towel drying herself after a bath, whole body visible from head to feet","抹乾身"),
+        ("bath4","a full-body wide shot of a little girl standing in a bedroom wearing clean pyjamas, clean fresh and happy after a bath, whole body visible from head to feet","著返睡衣"),
      ]},
     {"id":"bake", "char":"a cheerful East Asian Chinese little boy about 5 years old, short black hair, wearing an apron",
      "panels":[
