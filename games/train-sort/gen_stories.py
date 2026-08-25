@@ -15,9 +15,12 @@ IMG_DIR = os.path.join(HERE, "img")
 KEY_FILE = os.path.join(HERE, ".minimax_key")
 API_URL = os.environ.get("MINIMAX_URL", "https://api.minimaxi.com/v1/image_generation")
 
-SCENE = ("a bright, colourful, realistic and true-to-life photo of {subj}, "
-         "clean simple uncluttered background, natural lifelike appearance, warm vibrant colours, "
-         "single clear subject, suitable as a learning picture for young kids. "
+SCENE = ("a bright, colourful, realistic and true-to-life photo of {subj}. "
+         "IMPORTANT FRAMING: a medium-wide full-body shot, camera pulled back so the WHOLE child from head to feet "
+         "is visible together with the objects they are using, so the action and the interaction are clearly shown. "
+         "This is NOT a close-up portrait — do NOT crop into the face; show the whole body and the surroundings. "
+         "Clean simple uncluttered background, natural lifelike appearance, warm vibrant colours, "
+         "suitable as a learning picture for young kids. "
          "Realistic depiction, NOT a cartoon. No text, no letters, no numbers, no words, no watermark.")
 
 REF = ("a realistic photo, clear front portrait headshot of {subj}, "
@@ -66,7 +69,7 @@ STORIES = [
      "panels":[
         ("frog1","a cluster of jelly-like frog eggs floating in clear pond water, macro close up","青蛙蛋"),
         ("frog2","a single small black tadpole swimming in pond water","蝌蚪"),
-        ("frog3","a tadpole that has grown small back legs, becoming a froglet, in water","長出後腳"),
+        ("frog3","a dark round-headed tadpole with a long tail that has just grown two tiny back legs, still clearly a tadpole turning into a frog, swimming in pond water, NOT a lizard, NOT a newt, NOT a salamander","長出後腳"),
         ("frog4","one green frog sitting on a green leaf by a pond","變青蛙"),
      ]},
 ]
