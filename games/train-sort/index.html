@@ -85,7 +85,7 @@
   #arches { height:11vmin; background-repeat:repeat-x; background-position:center top; background-size:auto 100%; }
 
   /* 月台（卡池）*/
-  #yard { flex:0 0 auto; min-height:26vmin; display:flex; flex-wrap:wrap; align-items:center; align-content:center; justify-content:center;
+  #yard { flex:0 0 auto; min-height:var(--yardH,26vmin); display:flex; flex-wrap:wrap; align-items:center; align-content:center; justify-content:center;
     gap:2.4vmin; padding:2.6vmin 4vmin calc(4vmin + env(safe-area-inset-bottom));
     background:rgba(255,255,255,.35); border-top:.5vmin solid rgba(255,255,255,.6); }
   .card { width:var(--yw,19vmin); aspect-ratio:1/1; border-radius:2.4vmin; background:#fff;
@@ -336,6 +336,9 @@ function computeCW(n){
   let yw = Math.min(ywW, ywH, vmin*0.44, 240);
   yw = Math.max(yw, 60);
   document.documentElement.style.setProperty('--yw', yw+'px');
+  // 鎖住月台高度（預留成個 grid）→ 揀走卡都唔會縮，火車/路軌唔會上下郁
+  const yardH = rows*yw + (rows-1)*gy + vmin*0.12;
+  document.documentElement.style.setProperty('--yardH', yardH+'px');
 }
 
 /* ===== 遊戲狀態 ===== */
