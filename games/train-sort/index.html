@@ -62,10 +62,11 @@
   #train { display:flex; align-items:flex-end; gap:1vmin; padding:0 3vmin; justify-content:center; will-change:transform; z-index:2; }
   .loco { width:26vmin; max-width:170px; flex:none; }
   .loco svg { width:100%; height:auto; display:block; }
-  .carriage { flex:none; width:var(--cw,19vmin); }
+  .carriage { flex:none; width:var(--cw,19vmin); touch-action:none; }
   .cbody { aspect-ratio:1/1; border-radius:2.4vmin; background:#fff; border:.7vmin dashed #b7c8d6;
     display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative; }
-  .carriage.filled .cbody { border-style:solid; border-color:#fff; box-shadow:0 1vmin 0 rgba(0,0,0,.12); cursor:pointer; }
+  .carriage.filled .cbody { border-style:solid; border-color:#fff; box-shadow:0 1vmin 0 rgba(0,0,0,.12); cursor:grab; }
+  .carriage.dragging .cbody { visibility:hidden; }
   .wheels { display:flex; justify-content:space-around; margin-top:-.4vmin; padding:0 2vmin; }
   .wheels i { width:4.4vmin; height:4.4vmin; max-width:26px; max-height:26px; border-radius:50%;
     background:#3a3a3a; border:.7vmin solid #7a7a7a; display:block; }
@@ -383,22 +384,26 @@ function render(){
 
 function bind(){
   $("yard").querySelectorAll(".card").forEach(el=>{
-    el.addEventListener("pointerdown", e=>startDrag(e, +el.dataset.id, el));
+    el.addEventListener("pointerdown", e=>startDrag(e, +el.dataset.id, el, null));
   });
   $("train").querySelectorAll(".carriage.filled").forEach(el=>{
-    el.onclick = ()=>{ if(busy) return; removeSlot(+el.dataset.slot); };
+    const s=+el.dataset.slot;
+    el.addEventListener("pointerdown", e=>startDrag(e, slots[s], el, s));
   });
 }
 
-/* ===== 拖放（可拖去指定車卡；撳一下＝入下一格）===== */
+/* ===== 拖放（月台↔車卡；車卡之間可對調）===== */
+// srcSlot：null＝由月台拖；數字＝由該車卡拖
 function slotAt(x,y){
   const el=document.elementFromPoint(x,y); const car=el&&el.closest&&el.closest(".carriage");
   return car ? +car.dataset.slot : null;
 }
-function startDrag(e, id, card){
-  if(busy || e.button===1 || e.button===2) return;
+function startDrag(e, id, srcEl, srcSlot){
+  if(busy || id==null || e.button===1 || e.button===2) return;
   e.preventDefault();
   const sx=e.clientX, sy=e.clientY; let ghost=null, moved=false, lastSlot=null;
+  const cb=srcEl.querySelector(".cbody");
+  const contentHTML = cb ? cb.innerHTML : srcEl.innerHTML;   // 車卡取 .cbody 內容，月台卡取自己
   function highlight(slot){
     if(slot===lastSlot) return;
     $("train").querySelectorAll(".carriage.dragover").forEach(c=>c.classList.remove("dragover"));
@@ -408,8 +413,8 @@ function startDrag(e, id, card){
   function move(ev){
     const x=ev.clientX, y=ev.clientY;
     if(!moved && Math.hypot(x-sx,y-sy)>7){
-      moved=true; card.classList.add("dragging");
-      ghost=document.createElement("div"); ghost.className="drag-ghost"; ghost.innerHTML=card.innerHTML;
+      moved=true; srcEl.classList.add("dragging");
+      ghost=document.createElement("div"); ghost.className="drag-ghost"; ghost.innerHTML=contentHTML;
       document.body.appendChild(ghost);
     }
     if(ghost){ ghost.style.left=x+"px"; ghost.style.top=y+"px"; highlight(slotAt(x,y)); }
@@ -420,16 +425,31 @@ function startDrag(e, id, card){
     document.removeEventListener("pointercancel",up);
     if(ghost) ghost.remove();
     $("train").querySelectorAll(".carriage.dragover").forEach(c=>c.classList.remove("dragover"));
-    card.classList.remove("dragging");
+    srcEl.classList.remove("dragging");
     if(busy) return;
-    if(!moved){ placeCard(id); return; }            // 冇拖動＝當撳一下，入下一格
-    const s=slotAt(ev.clientX, ev.clientY);
-    if(s!=null) placeCardAt(id, s);                 // 拖到指定車卡
-    else render();                                   // 拖去空位＝取消
+    const t=slotAt(ev.clientX, ev.clientY);
+    if(!moved){                                     // 撳一下（冇拖動）
+      if(srcSlot==null) placeCard(id);              //   月台：入下一個空格
+      else removeSlot(srcSlot);                     //   車卡：返月台
+      return;
+    }
+    if(srcSlot==null){                              // 由月台拖
+      if(t!=null) placeCardAt(id, t); else render();
+    } else {                                        // 由車卡拖
+      if(t==null) removeSlot(srcSlot);              //   拖出火車＝返月台
+      else if(t===srcSlot) render();                //   放返自己
+      else swapSlots(srcSlot, t);                   //   同另一格對調／移動
+    }
   }
   document.addEventListener("pointermove",move);
   document.addEventListener("pointerup",up);
   document.addEventListener("pointercancel",up);
+}
+function swapSlots(a, b){
+  const t=slots[a]; slots[a]=slots[b]; slots[b]=t;   // b 空＝移動；b 有卡＝對調
+  sfx.click(); render();
+  const c=$("train").querySelector(`.carriage[data-slot="${b}"] .cbody`); if(c) c.classList.add("pop");
+  if(firstEmpty()<0) setTimeout(check, 350);
 }
 
 function firstEmpty(){ return slots.findIndex(s=>s==null); }
