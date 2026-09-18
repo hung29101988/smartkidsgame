@@ -221,6 +221,8 @@ function buildPlaylist(){
 let LEVELS = buildPlaylist();
 
 /* ===== MiniMax 圖預載（未有圖時 fallback 返 SVG）===== */
+const ASSET_V = "20260918";                       // 換圖後 bump 一下，令瀏覽器/CDN 快取失效
+const IMGSRC = k => "img/"+k+".jpg?v="+ASSET_V;
 const IMG_KEYS = (()=>{ const s=new Set(["ball","apple","star","duck","strawberry","tree"]);
   STORIES.forEach(st=>(st.imgs||[]).forEach(k=>s.add(k))); return [...s]; })();
 const IMGREADY = {};
@@ -229,7 +231,7 @@ function preloadImgs(cb){
   IMG_KEYS.forEach(k=>{ const im=new Image();
     im.onload =()=>{ IMGREADY[k]=true; if(--left===0) cb&&cb(); };
     im.onerror=()=>{ if(--left===0) cb&&cb(); };
-    im.src="img/"+k+".jpg"; });
+    im.src=IMGSRC(k); });
 }
 
 let _gid = 0;
@@ -262,26 +264,26 @@ function locoSVG(){
 /* ===== 卡內容：優先用 MiniMax 圖，未有就用 SVG ===== */
 function cardContent(level, item){
   if(level.type==="emoji"){
-    if(item.img && IMGREADY[item.img]) return `<img class="scene" src="img/${item.img}.jpg" alt="">`;
+    if(item.img && IMGREADY[item.img]) return `<img class="scene" src="${IMGSRC(item.img)}" alt="">`;
     return `<div class="emoji">${item.emoji}</div>`;
   }
   if(level.type==="size"){
     if(IMGREADY[level.obj]){
       const pct = Math.round(30 + item.size*(50/level.n));
-      return `<img class="obj" src="img/${level.obj}.jpg" style="width:${pct}%" alt="">`;
+      return `<img class="obj" src="${IMGSRC(level.obj)}" style="width:${pct}%" alt="">`;
     }
     return sizeSVG(level, item);
   }
   if(level.type==="height"){
     if(IMGREADY[level.obj]){
       const pct = Math.round(36 + item.h*(54/level.n));
-      return `<img class="obj tall" src="img/${level.obj}.jpg" style="height:${pct}%" alt="">`;
+      return `<img class="obj tall" src="${IMGSRC(level.obj)}" style="height:${pct}%" alt="">`;
     }
     return heightSVG(item);
   }
   if(level.type==="count"){
     if(IMGREADY[level.obj]){
-      let s=""; for(let i=0;i<item.n;i++) s+=`<img class="obj" src="img/${level.obj}.jpg" alt="">`;
+      let s=""; for(let i=0;i<item.n;i++) s+=`<img class="obj" src="${IMGSRC(level.obj)}" alt="">`;
       return `<div class="counts c${item.n}">${s}</div>`;
     }
     return countSVG(item);
