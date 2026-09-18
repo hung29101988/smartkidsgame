@@ -85,10 +85,10 @@
   #arches { height:11vmin; background-repeat:repeat-x; background-position:center top; background-size:auto 100%; }
 
   /* 月台（卡池）*/
-  #yard { flex:0 0 auto; min-height:26vmin; display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
+  #yard { flex:0 0 auto; min-height:26vmin; display:flex; flex-wrap:wrap; align-items:center; align-content:center; justify-content:center;
     gap:2.4vmin; padding:2.6vmin 4vmin calc(4vmin + env(safe-area-inset-bottom));
     background:rgba(255,255,255,.35); border-top:.5vmin solid rgba(255,255,255,.6); }
-  .card { width:var(--cw,19vmin); aspect-ratio:1/1; border-radius:2.4vmin; background:#fff;
+  .card { width:var(--yw,19vmin); aspect-ratio:1/1; border-radius:2.4vmin; background:#fff;
     border:.7vmin solid #fff; box-shadow:0 1vmin 0 rgba(0,0,0,.14); cursor:pointer;
     display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative; }
   .card:active { transform:translateY(.6vmin) scale(.97); }
@@ -317,7 +317,8 @@ function buildItems(level){
 
 /* ===== 車卡尺寸：撐到最大又要成條火車入到畫面 ===== */
 function computeCW(n){
-  const vw=innerWidth, vmin=Math.min(innerWidth,innerHeight);
+  const vw=innerWidth, vh=innerHeight, vmin=Math.min(vw,vh);
+  // 火車車卡：成條火車（車頭 + n 卡）要入一行
   const loco=Math.min(vmin*0.26,170);
   const gap=vmin*0.01, pad=vmin*0.03*2;
   const avail = vw - loco - pad - gap*(n+1) - vmin*0.02;
@@ -325,6 +326,16 @@ function computeCW(n){
   cw = Math.min(cw, vmin*0.30, 200);
   cw = Math.max(cw, 56);
   document.documentElement.style.setProperty('--cw', cw+'px');
+  // 月台卡：獨立尺寸，直度手機用 2 欄（2×2），唔會太細
+  const portrait = vh >= vw;
+  const cols = portrait ? Math.min(2,n) : n;
+  const rows = Math.ceil(n/cols);
+  const gy = vmin*0.024, py = vmin*0.04*2;
+  const ywW = (vw - py - gy*(cols+1)) / cols;           // 闊度限制
+  const ywH = (vh*0.46 - gy*(rows+1)) / rows;           // 高度限制（月台最多約 46% 高）
+  let yw = Math.min(ywW, ywH, vmin*0.44, 240);
+  yw = Math.max(yw, 60);
+  document.documentElement.style.setProperty('--yw', yw+'px');
 }
 
 /* ===== 遊戲狀態 ===== */
