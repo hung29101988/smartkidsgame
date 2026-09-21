@@ -554,14 +554,87 @@ const sfx = {
 })();
 
 /* ===== 開場人物 ===== */
-$("startHero").innerHTML = `<svg viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg">
-  <g transform="translate(20 10)">
-    ${locoSVG().replace('<svg viewBox="0 0 120 100"','<svg x="0" y="0" width="120" height="100" viewBox="0 0 120 100"')}
+$("startHero").innerHTML = `<svg viewBox="0 0 260 152" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="hbody" cx="38%" cy="28%" r="85%"><stop offset="0" stop-color="#ff9a90"/><stop offset="1" stop-color="#d62b2b"/></radialGradient>
+    <radialGradient id="hface" cx="42%" cy="35%" r="75%"><stop offset="0" stop-color="#ffeed8"/><stop offset="1" stop-color="#f5c694"/></radialGradient>
+    <linearGradient id="hwA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd76e"/><stop offset="1" stop-color="#f1b53a"/></linearGradient>
+    <linearGradient id="hwB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#86d2ff"/><stop offset="1" stop-color="#3fa7e6"/></linearGradient>
+    <linearGradient id="hwC" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a9e88c" /><stop offset="1" stop-color="#6bc148"/></linearGradient>
+    <radialGradient id="hbA" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#ffb3ad"/><stop offset="1" stop-color="#ef5350"/></radialGradient>
+    <radialGradient id="hbB" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#bfe0ff"/><stop offset="1" stop-color="#4f9ee0"/></radialGradient>
+    <radialGradient id="hbC" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#f0a92e"/></radialGradient>
+  </defs>
+
+  <!-- 地面陰影 -->
+  <ellipse cx="130" cy="138" rx="125" ry="7" fill="rgba(0,0,0,.10)"/>
+  <!-- 路軌 -->
+  <rect x="4" y="130" width="252" height="4.5" rx="2" fill="#c39a68"/>
+  <g fill="#9a774d">
+    <rect x="16" y="126" width="4" height="10" rx="1.5"/><rect x="46" y="126" width="4" height="10" rx="1.5"/>
+    <rect x="76" y="126" width="4" height="10" rx="1.5"/><rect x="106" y="126" width="4" height="10" rx="1.5"/>
+    <rect x="136" y="126" width="4" height="10" rx="1.5"/><rect x="166" y="126" width="4" height="10" rx="1.5"/>
+    <rect x="196" y="126" width="4" height="10" rx="1.5"/><rect x="226" y="126" width="4" height="10" rx="1.5"/>
   </g>
-  <g transform="translate(150 34)">
-    <rect x="0" y="40" width="30" height="20" rx="4" fill="#ff9f43"/>
-    <rect x="6" y="30" width="30" height="20" rx="4" fill="#4cb0e0"/>
-    <rect x="12" y="20" width="30" height="20" rx="4" fill="#8bd47a"/>
+
+  <!-- 煙 -->
+  <g fill="#eef4f8">
+    <circle cx="34" cy="34" r="6.5" opacity=".9"/><circle cx="44" cy="24" r="8.5" opacity=".8"/><circle cx="57" cy="16" r="10.5" opacity=".65"/>
+  </g>
+
+  <!-- 三卡（由細到大嘅波）-->
+  <!-- A 小 -->
+  <g>
+    <rect x="92" y="112" width="10" height="5" rx="2.5" fill="#5a5a5a"/>
+    <rect x="100" y="98" width="46" height="22" rx="6" fill="url(#hwA)" stroke="#d99a2b" stroke-width="2"/>
+    <circle cx="123" cy="96" r="9" fill="url(#hbA)"/><circle cx="120" cy="93" r="2.4" fill="rgba(255,255,255,.7)"/>
+    <circle cx="111" cy="126" r="8" fill="#3a3a3a" stroke="#8a8a8a" stroke-width="3"/><circle cx="111" cy="126" r="2.2" fill="#c8c8c8"/>
+    <circle cx="137" cy="126" r="8" fill="#3a3a3a" stroke="#8a8a8a" stroke-width="3"/><circle cx="137" cy="126" r="2.2" fill="#c8c8c8"/>
+  </g>
+  <!-- B 中 -->
+  <g>
+    <rect x="146" y="112" width="8" height="5" rx="2.5" fill="#5a5a5a"/>
+    <rect x="152" y="98" width="46" height="22" rx="6" fill="url(#hwB)" stroke="#2f8fce" stroke-width="2"/>
+    <circle cx="175" cy="92" r="12" fill="url(#hbB)"/><circle cx="171" cy="88" r="3" fill="rgba(255,255,255,.7)"/>
+    <circle cx="163" cy="126" r="8" fill="#3a3a3a" stroke="#8a8a8a" stroke-width="3"/><circle cx="163" cy="126" r="2.2" fill="#c8c8c8"/>
+    <circle cx="189" cy="126" r="8" fill="#3a3a3a" stroke="#8a8a8a" stroke-width="3"/><circle cx="189" cy="126" r="2.2" fill="#c8c8c8"/>
+  </g>
+  <!-- C 大 -->
+  <g>
+    <rect x="198" y="112" width="8" height="5" rx="2.5" fill="#5a5a5a"/>
+    <rect x="204" y="98" width="48" height="22" rx="6" fill="url(#hwC)" stroke="#4f9e30" stroke-width="2"/>
+    <circle cx="228" cy="88" r="15" fill="url(#hbC)"/><circle cx="223" cy="83" r="3.6" fill="rgba(255,255,255,.7)"/>
+    <circle cx="216" cy="126" r="8" fill="#3a3a3a" stroke="#8a8a8a" stroke-width="3"/><circle cx="216" cy="126" r="2.2" fill="#c8c8c8"/>
+    <circle cx="242" cy="126" r="8" fill="#3a3a3a" stroke="#8a8a8a" stroke-width="3"/><circle cx="242" cy="126" r="2.2" fill="#c8c8c8"/>
+  </g>
+
+  <!-- 火車頭 -->
+  <g>
+    <path d="M8 116 L2 128 L18 128 Z" fill="#9c2020"/>
+    <rect x="10" y="110" width="86" height="10" rx="4" fill="#4a4a4a"/>
+    <!-- 車身 -->
+    <rect x="14" y="60" width="58" height="52" rx="13" fill="url(#hbody)" stroke="#a32424" stroke-width="2"/>
+    <rect x="14" y="86" width="58" height="4" fill="rgba(0,0,0,.10)"/>
+    <circle cx="19" cy="72" r="5" fill="#ffe08a" stroke="#caa23c" stroke-width="1.5"/>
+    <!-- 煙囪 -->
+    <rect x="30" y="36" width="14" height="26" rx="3" fill="#3a3a3a"/><rect x="26" y="32" width="22" height="8" rx="3.5" fill="#3a3a3a"/>
+    <!-- 車廂 + 女司機 -->
+    <rect x="60" y="44" width="36" height="68" rx="10" fill="#c0392b" stroke="#a32424" stroke-width="2"/>
+    <circle cx="78" cy="66" r="15" fill="#cdeeff" stroke="#fff" stroke-width="3"/>
+    <g>
+      <circle cx="70" cy="58.5" r="3.6" fill="#5a3a22"/><circle cx="86" cy="58.5" r="3.6" fill="#5a3a22"/>
+      <circle cx="78" cy="67" r="10" fill="url(#hface)"/>
+      <path d="M68 65 Q68 55 78 55 Q88 55 88 65 Q83.5 60 78 61.5 Q72.5 60 68 65 Z" fill="#5a3a22"/>
+      <circle cx="74" cy="67" r="1.7" fill="#2b2b2b"/><circle cx="82" cy="67" r="1.7" fill="#2b2b2b"/>
+      <circle cx="70.5" cy="70" r="1.7" fill="#ff9db0" opacity=".7"/><circle cx="85.5" cy="70" r="1.7" fill="#ff9db0" opacity=".7"/>
+      <path d="M74.5 71.5 Q78 74.5 81.5 71.5" stroke="#c2502f" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+    </g>
+    <!-- 車輪 -->
+    <circle cx="34" cy="112" r="13" fill="#3a3a3a" stroke="#8a8a8a" stroke-width="4.5"/><circle cx="34" cy="112" r="3.6" fill="#c8c8c8"/>
+    <circle cx="62" cy="115" r="9.5" fill="#3a3a3a" stroke="#8a8a8a" stroke-width="3.5"/><circle cx="62" cy="115" r="2.6" fill="#c8c8c8"/>
+    <circle cx="84" cy="115" r="9.5" fill="#3a3a3a" stroke="#8a8a8a" stroke-width="3.5"/><circle cx="84" cy="115" r="2.6" fill="#c8c8c8"/>
+    <!-- 連桿 -->
+    <rect x="30" y="110" width="58" height="4" rx="2" fill="#6a6a6a" opacity=".6"/>
   </g>
 </svg>`;
 
